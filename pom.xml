@@ -12,5 +12,7 @@
         <module>ApplicationCatalog</module>
         <module>UserManagement</module>
         <module>TicketManagement</module>
+        <module>transaction</module>
+        <module>transactionapp</module>
     </modules>
 </project>
