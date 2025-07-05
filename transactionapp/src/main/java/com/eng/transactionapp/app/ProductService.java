@@ -10,7 +10,13 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    @Transactional
+    @Autowired
+    private FirstProgrammaticApproach firstProgrammaticApproach;
+
+    @Autowired
+    SecondProgrammaticApproach secondProgrammaticApproach;
+
+    @Transactional(transactionManager = "transactionManager")
     public void saveAllProduct() {
         for (int i = 1; i <= 10; i++) {
             Product product = new Product();
@@ -25,6 +31,8 @@ public class ProductService {
 
     @Transactional
     public void saveProduct(Product product) {
+        firstProgrammaticApproach.updateUser();
+        secondProgrammaticApproach.updateUser();
         productRepository.save(product);
 
         // Example of triggering rollback
