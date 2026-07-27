@@ -1,0 +1,836 @@
+
+https://youtu.be/jDJYLnmDDvs Spring Cloud | What is Spring Cloud Really All About?
+How to implement thread pool , what’s advantage of thread pool , how many type of thread pool do we have 
+
+java coding example
+https://youtu.be/837cgQcPrM0?list=PLF9tovyahfL020hGgLIsRMZY4bfSLCFUa 
+
+https://blog.udemy.com/25-microservices-questions-and-answers-to-study-before-your-next-interview/?utm_source=adwords&utm_medium=udemyads&utm_campaign=Search_DSA_GammaCatchall_NonP_la.EN_cc.India&campaigntype=Search&portfolio=India&language=EN&product=Course&test=&audience=DSA&topic=&priority=Gamma&utm_content=deal4584&utm_term=_._ag_166578677881_._ad_700948726520_._kw__._de_c_._dm__._pl__._ti_aud-2297301418005:dsa-1456167871416_._li_9302878_._pd__._&matchtype=&gad_source=1&gclid=CjwKCAjw2dG1BhB4EiwA998cqELRFVhBpATQlm5fpFYQuX-37d4c5O_zyDkj7wOwBEBV1onwFHpcXhoCKpIQAvD_BwE
+https://leetcode.com/discuss/interview-question/1342597/publicis-sapient-coding-round
+
+https://youtu.be/kNJ2tjBWlLs
+https://youtu.be/-KE0yms6PJ8
+
+https://youtu.be/q1JQvIS6vto
+Intermediate operations : filter, map, distinct, sorted, limit etc.
+Terminate operations: foreach, collect, reduce, count etc.
+Stream filterStream = originalStream.filter(element->/*predicate*/);
+Filter even num from ArrayList stream
+Stream mappedStream = originalStream.map(element->/*tronsformation function*/);
+
+Rat in a Maze
+Kedane algo
+Coin Change
+activate selection in greedy algo
+https://youtu.be/EglTqS3FYlU
+https://docs.google.com/spreadsheets/d/1k6hcdNsmBPxSPqaqmUpRKqBjax1-miMaRRKcbscL3ow/edit?pli=1&gid=0#gid=0
+
+https://youtu.be/KQDTtvZMS9c
+https://www.youtube.com/watch?v=BwYFuhVhshI
+Download kafka from apache
+config/server.properties, 
+c:/kafka/kafka-logs
+config/zookeeper.properties
+c:/kafka/zookeeper-data
+c:\kafka>
+.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+.\bin\windows\kafka-server-start.bat .\config\server.properties
+windows>
+kafka-topics.bat --create --bootstrap-server localhost:9092 --topic test
+kafka-topics.bat --describe --topic test --bootstrap-server localhost:9092 
+kafka-console-producer.bat --broker-list localhost:9092 –topic test
+kafka-console-consumer.bat --topic test-topic --bootstrap-server localhost:9092 --from-beginning
+{"name":"anup","age":52,"gender":"male"}
+
+kafka>
+.\bin\windows\zookeeper-server-stop.bat .\config\zookeeper.properties
+.\bin\windows\kafka-server-stop.bat .\config\server.properties
+
+
+
+24. Fully Understanding the Component Selector
+  // selector: 'app-root',
+  // selector: '[app-root]',   ==> as attribute
+  selector: '.app-root',  ==> as class
+
+<body>
+	<div app-root></div>
+  <!-- <app-root></app-root> -->
+  <div class="app-root"></div>
+</body>
+
+
+ApplicationUser
+@ManyToMany(name="user_role_junction", joinColumns = {@JoinColumn(name="user_id")},
+inversJoinColumns = {@JoinColumn(name="role_id")})
+private Set<Role> authorities;
+
+ApplicationUser
+@ManyToMany(name="user_role_junction", joinColumns = {@JoinColumn(name="user_id")},
+inversJoinColumns = {@JoinColumn(name="role_id")})
+private Set<Role> authorities;
+
+class Token
+@ManytoOne
+@JoinColumn(name="user_id")
+private User user
+
+class User
+@OneToMany(mappedBy="user")
+private List<Token> tokens
+
+@Query("select t from Token t inner join User u on t.user.id =u.id
+where u.id =: userId and (t.expired=false or t.revoked=false)
+List<Token> findAllValidTokensByUser(Integer userId);
+
+node -e "console.log(require('crypto').(32).toString('hex'))"
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jwt_security
+    username: username
+    password: password
+    driver-class-name: org.postgresql.DriverrandomBytes
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+
+User implements UserDetails
+
+@Enumerated(EnumType.STRING)
+private Role role;
+getAuthorities(){
+	retrun List.of(new SimpleGrantedAuthority(role.name)));
+}
+
+//SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roles.name());
+//return Arrays.asList(authority);
+return List.of(new SimpleGrantedAuthority(roles.name()));
+
+
+public UserDetailsService userDetailsService() {
+        return email -> userRepository.findByEmail(email)
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
+    }
+
+spring.datasource.url=jdbc:h2:file:/data/demo;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=create-drop
+	
+	
+	
+logging.level.root=WARN
+logging.level.web=INFO
+logging.level.com.example=DEBUG	
+
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.Type=TRACE
+	
+spring.datasource.url=jdbc:mysql://localhost:33060/db5
+spring.datasource.username=root
+spring.datasource.password=root
+spring.datasource.testWhileIdle=true
+spring.datasource.validationQuery=SELECT 1
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.hibenate.naming-strategy=org.hibernate.cfg.ImprovedNamingStrategy
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.main.allow-circular-references=true
+
+mysqld --console --initialize --basedir=C:\Users\qxz1mm1\mysql8 --datadir=C:\Users\qxz1mm1\mysqldata
+mysqld --console --datadir=C:\Users\qxz1mm1\mysqldata
+mysql.exe -u root -p
+mysql.exe -u root -p
+alter user 'root'@'localhost' identified by 'root';
+mysqladmin -u root -p root
+port: 33060
+root@localhost: tiibqI7.p&x8
+create table student (id integer(2), name varchar(10));
+insert into student values(1,'ramesh');
+select * from student;
+
+
+Tm2BpKlv1rU
+1. Lambda Expression: Bring functional programming in java, anonymous function
+2. Functional Interface
+3. Default Methods and static methods
+4. Predefined Functional Interfaces (Predicate, Function, Consumer, Supplier)
+5. Double Colon Operator (::) (Method reference, Constructor reference)
+6. Streams
+7. Date and Time API
+8. Optional class
+9. Nashron JavaScript Engine
+
+Lambda expression - No method name, no return type, no modifier
+netstat -ano | findstr :8080
+taskkill /PID 2660 /F
+java-8-new-features-in-simple-way/learn/v4/t/quiz/4463238/test
+Runnable ==> run()
+Callable ==> call()
+Comparable ==> compareTo()
+Camparator ==> compare()
+ActionListner ==> actionPerformed()
+allkeysgenerator.com/Random/SEcurity-Encryption-Key-Generator.apsx
+https://youtu.be/0GGFZdYe-FY How to Logout from Spring Security - JWT
+https://www.youtube.com/watch?v=lJxjTLU9pGs Spring Boot WebFlux : Send SMS/OTP using Twilio | Forgot/Reset Password scenario | JavaTechie
+Recovery code: JCLKT2AMKMTPMBXCPFHVCVBY
+Account SID: ACd00eb9d4f2256ccdb2250e91a52be983
+Auth Token: b2fd4329f8120d30dda896566723848c
+Twilio phone number: +12342941028
+
+https://youtu.be/MWJymqlWzTQ OTP validateOTP
+https://youtu.be/HFQAPW8SMBM Java Coding Interview Questions and Answers | Sorting using comparator
+https://www.youtube.com/watch?v=iDogrHEo4x0
+https://www.youtube.com/watch?v=3etdgEGj-TI
+https://youtu.be/X48mMxEMYps
+https://medium.com/javarevisited/java-11-features-and-highlights-ab4bed23058b JAVA 11
+https://youtu.be/hr2XTbKSdAQ
+https://youtu.be/a3ZdcDvUwdY
+https://youtu.be/lnKPoWZnNNM
+https://youtu.be/J1RmZZEkN0k?list=PLtgomJ95NvbPDMQClkBZPijLdEFyo0VHa
+https://youtu.be/-9VcW7MBDs8
+https://youtu.be/4fqSaiGF2yg
+https://www.youtube.com/watch?v=7fAB4WS29oM MASTER JWT Authentication with Java Spring Boot 3
+https://youtu.be/KxqlJblhzfI Spring Boot 3 + Spring Security 6 - JWT Authentication and Authorisation Amigoscode
+https://www.youtube.com/watch?v=Tm2BpKlv1rU Session - 1
+https://www.youtube.com/watch?v=k2PiRM2d_iU Session - 2
+https://www.youtube.com/watch?v=129QkkXUHeQ Liskov Substitution Principle 
+https://www.baeldung.com/java-open-closed-principle
+https://www.youtube.com/watch?v=5rbdwovjbw4 Method Reference in Java 8
+https://www.youtube.com/watch?v=S5zVwjtMxoc Method() and Constructor Reference by Durga
+https://www.youtube.com/watch?v=d8NfHwVTcO0 Predicate, Function & Consumar by Durga Sir
+https://www.youtube.com/watch?v=5rbdwovjbw4 Method Reference JavaTechie
+https://www.youtube.com/watch?v=-1XE__rrbjQ Lambda Expression & Functional Interface Java Techie
+https://youtu.be/CwvlS3ViGFQ map () & flatMap() Example | JavaTechie
+https://www.youtube.com/watch?v=4BUKaazoYyg Optional Usage and Best Practices | JavaTechie
+https://www.prepbytes.com/blog/java/20-must-practice-basic-java-programs-for-beginners/
+https://youtu.be/4_jey1hfEw0?list=RDCMUCORuRdpN2QTCKnsuEaeK-kQ What’s new in 3.0 Release | Latest Features | JavaTechie
+https://youtu.be/NcLtLZqGu2M Spring Boot 3.0 + Spring Security 6 | JWT Authentication & Authorization | JavaTechie
+https://youtu.be/SzhWim1tnQk?list=PLQTYNpk8jwk2StWpxZU93ZdVC14OVKNED #22 Authentication & Authorization using Database | Spring Security 6.0
+https://youtu.be/WCOPonR1-R8 MYSQL8 ZIP install
+SOLID - 
+https://medium.com/@javatechie/solid-design-principle-java-ae96a48db97
+
+List<Integer> numbers = Arrays.asList(1,2,3,4,5,3,2,4,4,2,2,1);
+
+Map<Integer, Long> occurrences = numbers.stream()
+	.collect(Collectors.groupingBy(n -> n, Collectors.counting()));
+
+products.sort(Comparator.comparing(Product::getName));
+products.stream().map(Product::getName).forEach(System.out::println);
+
+Collections.sort(employeeList,new NameComparator());
+System.out.println("Name sort: "); employeeList.stream()
+	.map(Employee::getName)
+	.forEach(System.out::println);
+
+
+System.out.println("\nAge reverse sort: "); employeeList.stream()
+	.map(Employee::getAge)
+	.sorted(Comparator.reverseOrder())
+	.forEach(System.out::println);
+
+System.out.println("\nPincode reverse sort: "); employeeList.stream()
+	.map(employee -> employee.getAddress().getPincode())
+	.sorted(Comparator.reverseOrder())
+	.forEach(System.out::println);
+
+
+try with resource
+compositkey
+named query, parameterized query
+How to use stack memory and heap memory in java program
+Cache management is java with example Guava/Ehcache
+Difference between Serialization and Externalization
+Difference between HashMap, ConcurrentHashMap, SynchronizedHasshMap and its uses
+Difference between java HashMap, ConcurrentHashMap, SynchronizedHasshMap and its uses
+replacement ng-show , ng-hide
+SOLID
+IOC Container
+Sprint Cloud
+Disadvantage of Dependency Injection
+IOC Container
+Difference in directives and components
+sql query optimization step
+uses of Spring Cloud
+sql query optimization step
+core java oops cocepts
+project modular changes estimation techniques
+Memory challenges
+MVC CONTROLLER AND REST CONTROLLER
+Difference between String, StringBuffer and StringBuilder and where to use which one
+How to maintain session in case of guest user
+Difference between OAuth and OAuth2
+
+
+Single Responsibility
+Open/Closed
+Liskov Substitution
+Interface segregation
+Dependency inversion
+
+===================
+https://www.youtube.com/watch?v=6XrL5jXmTwM UML class diagrams
+https://www.youtube.com/watch?v=4emxjxonNRI UML use case diagrams
+
+Stream<String> streamEmpty = Stream.empty();
+Stream<String> streamOfArray = Stream.of("a", "b", "c");
+
+
+Collection<String> collection = Arrays.asList("a", "b", "c");
+Stream<String> streamOfCollection = collection.stream();
+
+Stream<String> streamOfArray = Stream.of("a", "b", "c");
+
+String[] arr = new String[]{"a", "b", "c"};
+Stream<String> streamOfArrayFull = Arrays.stream(arr);
+Stream<String> streamOfArrayPart = Arrays.stream(arr, 1, 3);
+
+String s1 = "jai";
+Consumer<String> c1 = System.out::println;
+c1.accept(s1);
+
+===============
+
+
+twilio.account_sid=
+twilio.auth_token=
+twilio.trial_number=
+
+@Configuration
+@ConfigurationProperties(prefix="twilio")
+@Data
+TwilioConfig
+
+Application
+@PostConstruct
+initTwilio()
+Twilio.init(twilioConfig.sid, twilioConfig.auth_token)
+
+@Service
+TwilioOTPService
+Mono<PasswordResetReponseDto> sendOTPForPasswordReset(PasswordResetRequestDto)
+PasswordResetReponseDto 
+Map otpMap
+try {
+PhoneNumber to=new PhoneNumber(PasswordResetRequestDto.getPhoneNum)
+PhoneNumber from=new PhoneNumber(twilioConfig.getTrailNumber)
+String otpMsg = "Dear Customer, " + otp;
+Message message = Message.creator(to,from,otpMsg).create();
+PasswordResetReponseDto = new PasswordResetReponseDto(OtpStatus.DELIVERED, otpMsg)
+} catch(Exception ex)
+{ PasswordResetReponseDto = new PasswordResetReponseDto(OtpStatus.FAILED, excp.getmessage)}
+return Mono.just(PasswordResetReponseDto );
+
+validateOTP
+
+
+PasswordResetRequestDto
+String phnum,username, otp
+
+@Data
+@AllArgumentConstructor
+@NoArgumentConstructor
+PasswordResetReponseDto
+OtpStatus status
+String message
+
+Enum OtpStatus
+DELIVERED, FAILED
+
+
+List<Integer> values = Arrays.asList(4,5,6,7,8);
+
+for(int i=0; i< values.size(); i++) {
+	System.out.println(values.get(i));
+}
+
+for(int value : values) {
+	System.out.println(value);
+}
+
+values.forEach(System.out::println);
+
+values.forEach(i -> System.out.println(i));
+
+values.stream().forEach(System.out::println);
+
+class ConsumerImpl implements Consumer<Integer> {
+    public void accept(Integer i) {
+        System.out.println(i);
+    }
+}
+
+class PredicateImpl implements Predicate<Integer> {
+    public boolean test(Integer i){
+        return i%2==0;
+    }
+}
+Predicate<Integer> predicate = i -> i%2==0;
+List<Integer> values = Arrays.asList(3,4,5,6,7,8);
+Consumer<Integer> consume = i -> System.out.println(i);
+values.forEach(consume);
+
+git --version
+git config --global user.name "<USER_NAME>"
+git config --global user.email "<USER_EMAIL>"
+git config --list
+git status/add/commit/log/help
+
+
+
+
+class Solution {public int solution(int[] A) {// write your code in C# 6.0 with .NET 4.5 (Mono)List<int> numbers = new List<int>();numbers.AddRange(A);numbers.Sort();int first = numbers.First();int last = numbers.Last();
+var missing = Enumerable.Range(first, last).Where(n => n % first == 0).Except(numbers);
+return missing.First();}}
+
+FrogJmp (Frog Jump)
+Fibonacci
+
+Print an Array
+
+public static void main(String[] args) {
+        int[] array = {1, 2, 3, 4, 5};
+
+        System.out.println(Arrays.toString(array));
+    }
+
+public static void main(String[] args) {
+        int[][] array = {{1, 2}, {3, 4}, {5, 6, 7}};
+
+        System.out.println(Arrays.deepToString(array));
+    }	
+	
+
+public int[] fib(int MX) {
+    if(MX == 1) { return new int [] { 0 }; }
+    if(MX == 2) { return new int [] { 0, 1 }; }
+   
+    int [] fibb = new int [MX];
+    fibb[0] = 0;
+    fibb[1] = 1;
+
+    for(int i=2; i<fibb.length; i++) {
+      fibb[i] = fibb[i-1] + fibb[i-2];
+    }
+    return fibb;
+  }	
+
+static int frogJump(int X, int Y, int D) {
+
+        int dist = Y - X;
+        int jump = dist / D;
+        if(dist % D != 0) jump++;
+        return jump;
+    }  
+
+static int binGap(int N) {
+        String binStr = Integer.toBinaryString(N);
+        List oneList = new ArrayList();
+        for(int i=0; i< binStr.length(); i++) {
+            if(binStr.charAt(i) == '0') continue;
+            oneList.add(i);
+        }
+        int longdist = 0;
+        for(int i=0; i< oneList.size() -1; i++) {
+            int diff = (int) oneList.get(i+1) -  (int) oneList.get(i) -1;
+            longdist = Math.max(longdist, diff);
+        }
+        return longdist;
+    }	
+
+
+
+
+
+
+
+public class MinDeletionsToMakeStringBalanced {
+    
+    public int solution(String s) {
+        int openCount = 0;
+        int deletions = 0;
+
+        for (char c : s.toCharArray()) {
+            if (c == '(') {
+                openCount++;
+            } else if (c == ')') {
+                if (openCount > 0) {
+                    openCount--;
+                } else {
+                    deletions++;
+                }
+            }
+        }
+
+        // Remaining opening brackets need to be deleted
+        deletions += openCount;
+
+        return deletions;
+    }
+
+    public static void main(String[] args) {
+        String s = "))((";
+        System.out.println("Minimum deletions required: " + minDeletionsToBalance(s));
+    }
+}
+
+
+public String solution(String s) {
+        StringBuilder result = new StringBuilder();
+        char lastChar = ' ';
+        
+        for (char c : s.toCharArray()) {
+            if (c != lastChar) {
+                result.append(c);
+                lastChar = c;
+            }
+        }
+
+        return result.toString();
+    }
+
+
+
+We are givin a string S of length N consisting only of letter 'A' and/or 'B'. Our goal is to obtained a string in the format "A...AB...B" (all letters 'A' occur before all letters 'B') by deleting some letters from S. In particular, strings consisting only of letters 'A' or only of letters 'B' fit this format. Write a function: class Solution { public int solution(String S); } that, given a string S, returns the minimum number of letters that need to be deleted from S in order to obtain a string in the above format.
+Examples: 
+1. Given S = "BAAABAB", the function should return 2. We can obtain "AAABB" by deleting the frist occurence of 'B' and the last occurence of 'A'.
+2. Given S = "BBABAA", the function should retrun 3. We can delete all occurences of 'A' or all occurences of 'B'.
+3. Given S = "AABBBB", the function should retrun 0. We do not have to delete any letters, because the given string is already in the expected format. 
+
+
+
+
+public class FormatString {
+    
+    public static String obtainFormatString(String s) {
+        int countA = 0, countB = 0;
+        
+        for (char c : s.toCharArray()) {
+            if (c == 'A') {
+                countA++;
+            } else if (c == 'B') {
+                countB++;
+            }
+        }
+        
+        StringBuilder result = new StringBuilder();
+        
+        if (countA > countB) {
+            for (int i = 0; i < countB; i++) {
+                result.append('A');
+            }
+            for (int i = 0; i < countB; i++) {
+                result.append('B');
+            }
+        } else {
+            for (int i = 0; i < countA; i++) {
+                result.append('A');
+            }
+        }
+
+        return result.toString();
+    }
+
+    public static void main(String[] args) {
+        String s = "AABBBAAAB"; // Example input string
+        String formattedString = obtainFormatString(s);
+        System.out.println("Formatted string: " + formattedString);
+    }
+}
+
+
+
+
+
+
+public class MaximumBananaMove {
+    
+    public static int maxBananaMove(String s) {
+        // Count occurrences of each letter
+        int[] count = new int[26];
+        for (char c : s.toCharArray()) {
+            count[c - 'A']++;
+        }
+
+        // Calculate how many times "BANANA" can be formed
+        int maxMoves = Integer.MAX_VALUE;
+        maxMoves = Math.min(maxMoves, count['B' - 'A']); // 'B' appears only once in "BANANA"
+        maxMoves = Math.min(maxMoves, count['A' - 'A'] / 3); // 'A' appears three times in "BANANA"
+        maxMoves = Math.min(maxMoves, count['N' - 'A'] / 2); // 'N' appears twice in "BANANA"
+        
+        return maxMoves;
+    }
+
+    public static void main(String[] args) {
+        String s = "BANANAS";
+        System.out.println("Maximum number of times the move can be applied: " + maxBananaMove(s));
+    }
+}
+
+
+
+
+
+
+public class StringOperations {
+    
+    public String solution(String s, String t) {
+        int n = s.length();
+        int m = t.length();
+
+        if (n == m) {
+            if (s.equals(t)) {
+                return "EQUAL";
+            } else if (isInsert(s, t)) {
+                return "INSERT";
+            } else if (isRemove(s, t)) {
+                return "REMOVE";
+            } else if (isSwap(s, t)) {
+                return "SWAP";
+            }
+        } else if (n + 1 == m) {
+            if (isInsert(s, t)) {
+                return "INSERT";
+            }
+        } else if (n - 1 == m) {
+            if (isRemove(s, t)) {
+                return "REMOVE";
+            }
+        }
+
+        return "IMPOSSIBLE";
+    }
+
+    private boolean isInsert(String s, String t) {
+        int i = 0, j = 0;
+
+        while (i < s.length() && j < t.length()) {
+            if (s.charAt(i) != t.charAt(j)) {
+                if (i != j) return false;
+                j++;
+            } else {
+                i++;
+                j++;
+            }
+        }
+
+        return true;
+    }
+
+    private  boolean isRemove(String s, String t) {
+        return isInsert(t, s);
+    }
+
+    private  boolean isSwap(String s, String t) {
+        int firstDiff = -1, secondDiff = -1;
+
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) != t.charAt(i)) {
+                if (firstDiff == -1) {
+                    firstDiff = i;
+                } else if (secondDiff == -1) {
+                    secondDiff = i;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return (firstDiff != -1 && secondDiff != -1 && 
+                s.charAt(firstDiff) == t.charAt(secondDiff) && 
+                s.charAt(secondDiff) == t.charAt(firstDiff));
+    }
+
+    public static void main(String[] args) {
+        String s = "abcd";
+        String t1 = "abdc"; // SWAP
+        String t2 = "abcde"; // INSERT
+        String t3 = "abc"; // REMOVE
+        String t4 = "abcdf"; // IMPOSSIBLE
+
+        System.out.println(stringOperation(s, t1)); // SWAP
+        System.out.println(stringOperation(s, t2)); // INSERT
+        System.out.println(stringOperation(s, t3)); // REMOVE
+        System.out.println(stringOperation(s, t4)); // IMPOSSIBLE
+    }
+}
+
+
+
+// passing function to a function
+List<String> names = Arrays.asList("Navin","Reddy");
+/*Consumer<String> con = new Consumer<String>()
+{
+	public void accept(String s){ sout(str);}
+};*/
+Consumer<String> con = s -> sout(str);
+
+names.forEach(System.out::println);
+//names.forEach(str -> sout(con));
+//names.forEach(str -> sout(str));
+
+// ::println -- this a mothod - ::
+
+
+import java.util.function.*;
+
+public class MethodReferenceExample {
+    public static void main(String[] args) {
+        // Reference to a static method
+        Function<Integer, String> staticMethodRef = MethodReferenceExample::staticMethod;
+        System.out.println(staticMethodRef.apply(5)); // Output: The number is 5
+
+        // Reference to an instance method of a particular object
+        MethodReferenceExample instance = new MethodReferenceExample();
+        Function<String, String> instanceMethodRef = instance::instanceMethod;
+        System.out.println(instanceMethodRef.apply("world")); // Output: Hello, world!
+
+        // Reference to an instance method of an arbitrary object of a particular type
+        Function<String, Integer> lengthMethodRef = String::length;
+        System.out.println(lengthMethodRef.apply("Java")); // Output: 4
+
+        // Reference to a constructor
+        Supplier<MethodReferenceExample> constructorRef = MethodReferenceExample::new;
+        MethodReferenceExample newObj = constructorRef.get();
+        newObj.method(); // Output: Constructor called
+    }
+
+    // Static method
+    public static String staticMethod(Integer num) {
+        return "The number is " + num;
+    }
+
+    // Instance method
+    public String instanceMethod(String name) {
+        return "Hello, " + name + "!";
+    }
+
+    // Constructor
+    public MethodReferenceExample() {
+        System.out.println("Constructor called");
+    }
+
+    // Another method
+    public void method() {
+        System.out.println("Method called");
+    }
+}
+
+
+
+Function<Integer, String> intToString = num -> Integer.toString(num);
+String result = intToString.apply(10); // result will be "10"
+
+Supplier<Double> randomNumberSupplier = () -> Math.random();
+double randomNumber = randomNumberSupplier.get(); // Get a random number
+
+Consumer<String> stringPrinter = str -> System.out.println(str);
+stringPrinter.accept("Hello, world!"); // Prints "Hello, world!"
+
+Predicate<Integer> isEven = num -> num % 2 == 0;
+boolean result = isEven.test(5); // result will be false
+
+
+import java.util.stream.IntStream;
+
+public class IntStreamExample {
+    public static void main(String[] args) {
+        // Creating an IntStream from a range
+        IntStream.range(1, 10)
+                 .forEach(System.out::println); // Prints numbers from 1 to 9
+
+        // Creating an IntStream from an array
+        int[] numbers = {1, 2, 3, 4, 5};
+        IntStream streamFromArray = IntStream.of(numbers);
+        streamFromArray.forEach(System.out::println); // Prints numbers 1 to 5
+
+        // Using map to transform elements
+        IntStream.range(1, 5)
+                 .map(x -> x * 2)
+                 .forEach(System.out::println); // Prints even numbers from 2 to 8
+
+        // Using filter to select elements
+        IntStream.range(1, 10)
+                 .filter(x -> x % 2 == 0)
+                 .forEach(System.out::println); // Prints even numbers from 2 to 8
+
+        // Using sum to calculate the sum of elements
+        int sum = IntStream.range(1, 6)
+                          .sum();
+        System.out.println("Sum: " + sum); // Prints "Sum: 15"
+    }
+}
+
+
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CustomAuthenticationProvider implements AuthenticationProvider {
+
+    private final UserDetailsService userDetailsService;
+
+    public CustomAuthenticationProvider(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String username = authentication.getName();
+        String password = authentication.getCredentials().toString();
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        // Perform custom authentication logic here
+        // For example, compare the provided password with the one stored in the UserDetails object
+        if (password.equals(userDetails.getPassword())) {
+            return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
+        } else {
+            throw new BadCredentialsException("Invalid username or password");
+        }
+    }
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+    }
+}
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final AuthenticationProvider authenticationProvider;
+
+    public SecurityConfig(AuthenticationProvider authenticationProvider) {
+        this.authenticationProvider = authenticationProvider;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(authenticationProvider);
+    }
+}

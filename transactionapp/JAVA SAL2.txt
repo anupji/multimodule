@@ -1,0 +1,703 @@
+What all scrum ceremonies to follow,  what is story slicing in scrum
+What all annotations have you worked on
+Springboot advantages and disadvantages
+What is rest template and what are its uses
+How do you handle session in microservices or in your application, How to maintain a session of user who logged in?
+Explain Latest feature of Java 8
+How does HashMap works Internally (before java 8/ java 8)
+Error/ Exception/Custom Exception
+List of Employee filter employee sal>50
+How memory is allocated to ENUM 
+What is an optinal class, when do we use it.
+What is strean API? Why do we require the Stream API
+Difference between Collection API and Stream API
+What is the difference between Map and flatMap Stream Operation
+Explain about lazy loading in Hibernate
+How trnasaction mamangement is done in your application, Explain the various ways to perform transaction managemnt.
+How exception are handled in microservices.
+Micro service is deployed on different machine and on one machine the service fails randomly, how do you identify that machine
+What problem does microservice solved. What problem you face in molithic application design.
+What difficulties you have faced while developing  or deploying the microservices.
+What do you mean when we say rest apis are stateless and what is the advantages or disadvantages of it.
+What are the differnent methods in REST explain when to use what
+
+
+
+GitHub Copilot
+Explain the very technical code to non-technical users like managers and senior VPs
+Please keep responses short
+Please keep responses formal
+Management and non-technical users
+Plain text
+
+https://chromewebstore.google.com/detail/joycode/mihgbgcojjjcgckpoclhjoneafcmfpng?utm_source=ext_app_menu
+https://bmwgroup.sharepoint.com/:p:/t/x_labamericas/EfIeyB6t1PJHudbVa4MwJOkBjLsdLG29yZQPRd_w8vTadQ?e=b9bo0K
+https://atc.bmwgroup.net/confluence/display/AI4DEVOPS/AI4DevOps
+https://joycode.bmwgroup.net:8440/topic/category/Best%20Practice
+https://atc.bmwgroup.net/confluence/pages/viewpage.action?pageId=5611682895
+https://joycode.bmwgroup.net/#/home
+https://joycode.bmwgroup.net/#/installation-guide?key=vscode
+https://marketplace.visualstudio.com/items?itemName=BMWLingYueCIH.JoyCode
+How to Start Hands-On_JoyCode
+Dev Use Cases Demo_JoyCode
+JoyCode Introduction.mp4
+Event Introduction_Frank_JoyCode *
+OPS USE CASE DEMOS
+
+
+Team Name: [Team or Role Name]
+Purpose: [Brief description of the team or role's purpose]
+Key Products/Services: [List of key products/services]
+Key Stakeholders: [List of key stakeholders]
+Common Acronyms: [List of acronyms with definitions]
+Examples: [Brief example(s) of projects or interactions]
+
+The below information describes my team and what we do.
+Team Name: DTO Americas (Data Transformation Office Americas Region)
+Purpose: Data Transformation topics including Data Management and Data Governance enablement and Training. The goal is to enable Data as a Product for use and.
+reusability.
+-Key Products/Services: Data Governance Framework awareness, Consulting, Training, Onboarding
+- Key Stakeholders: Business Use Case Owners in various Domains, Data Governors, Data Stewards, Data Engineers.
+-Common Acronyms: DMGF
+- Examples: [Brief example(s) of projects or interactions]
+=========================
+The below information describes my team and what we do.
+Team Name: DTO Americas (Data Transformation Office Americas Region)
+Purpose: Data Transformation topics including Data Management and Data Governance enablement and Training. The goal is to enable Data as a Product for use and.
+reusability.
+-Key Products/Services: Data Governance Framework awareness, Consulting, Training, Onboarding
+- Key Stakeholders: Business Use Case Owners in various Domains, Data Governors, Data Stewards, Data Engineers.
+
+Using the milestones, can you summerize the categoryes of interactions, projects, engagements and tasks for the team this year?
+===========================
+
+Do I have any new tasks or requests from Confluence or jira today?
+Do I have an emails requiring urgent attention? Can you help me prioritize?
+Do I have new meetings for today?
+=======================
+https://outlook.office.com/mail/Anupkumar.Singh@partner.bmw.in@bmwgroup.mail.onmicrosoft.com
+https://atc.bmwgroup.net/confluence/display/DTOAMX/2024+-+Milestones DTO Americas Region
+MFG130 COMPLAINCE
+dwni6u5x8uyyf.cloudfront.net/awm-governance7
+gaia.bmwgroup.net/genai/dev-space/edit-app/e5dca2f9-770e-46f6-97bf-24b6d4e48215 
+(https://atc.bmwgroup.net/confluence/display/GENEXT/Guidance+on+requesting+GAIA+RightNow+roles)
+gaia.bmwgroup.net/genai
+https://mail.bmwgroup.net/owa
+Welcometobmwindia2020#2024
+qxz1mm1@asiapacific.bmw.corp/pswd
+Gwendolyn.Stamp
+
+
+
+
+turning.com/interview-questions/graphql
+hasura v2.0.6
+graphiql
+http://10.5.198.157:31176/v1/graphql
+Liquibase
+
+
+cd C:\Users\qxz1mm1\jupytor
+jupytor notebook
+
+https://youtu.be/p3AIecyvok4 Hosting Springboot App on render.com
+https://youtu.be/q8OleYuqntY https://www.techworld-with-nana.com/
+nginx.org/en/docs
+SSL/TLS
+https://youtu.be/1jCM4jKV68U
+
+Amazon
+Lex, Polly, Rekognition, ML
+
+server:
+  port: 8443
+  ssl:
+    # Accepting HTTPS connections only
+    enabled: true
+    # The path to the keystore containing the certificate
+    key-store: classpath:keystore.p12
+    # The password used to generate the certificate
+    key-store-password: tomcat
+    # The format used for the keystore
+    key-store-type: PKCS12
+    # The alias mapped to the certificate
+    key-alias: tomcat
+
+
+server:
+  ssl:
+    key-alias: spring-https	
+	key-store: classpath:javatechie.jks
+    key-store-type: JKS
+    key-store-password: password
+
+  port: 7777
+
+  
+spring-https/src/main/resources/application.yml
+
+keytool -genkey -alias spring-https -storetype JKS -keyalg RSA -keysize 2048 -validity 365 -keystore javatechie.jks
+last name: You tube
+org unit: Technology
+org: Javatechie
+City: Banglore
+State: Karnataka
+Country: IN
+
+Warning:
+The JKS keystore uses a proprietary format. It is recommended to migrate to PKCS12 which is an industry standard format using 
+"keytool -importkeystore -srckeystore javatechie.jks -destkeystore javatechie.jks -deststoretype pkcs12".
+
+https://platform.openai.com/tokenizer
+https://docs.spring.io/spring-framework/reference/web/webmvc-view.html
+https://www.luv2code.com/bonus-lecture-spring-boot-rest-security-jpa-hibernate-bcrypt-pdf
+https://www.luv2code.com/bonus-lecture-spring-boot-rest-security-jpa-hibernate-bcrypt-code
+https://www.bcryptcalculator.com/
+https://luv2code.com/generate-bcrypt-password
+https://luv2code.com/why-bcrypt (https://danboterhoven.medium.com/why-you-should-use-bcrypt-to-hash-passwords-af330100b861)
+https://luv2code.com/bcrypt-wiki-page (https://en.wikipedia.org/wiki/Bcrypt)
+https://luv2code.com/password-hasing-best-practices (https://crackstation.net/hashing-security.htm)
+C:\Users\qxz1mm1\Downloads\pgsql\bin>pg_ctl -D C:\Users\qxz1mm1\psql\mydata -l logfile start
+https://youtu.be/cYFYfYXObgA
+Grafana : Setup Grafana for Spring Boot app | Actuator, Prometheus & Grafana | Monitoring & Alerting
+https://youtu.be/gJZhdEJvZmc
+
+Filters
+HttpBasicAuthentication(Authentication Filter) (FilterChain, SecurityContext)
+AuthenticationMgr
+AuthenticationProvider(Mutiple Auth Prvd) uses (UserDetailsService, PasswordEncoder)
+
+Intro
+Dependencies
+Lifecycle, goal, plugins
+Archetypes
+.m2e eclipse plugins
+
+Intro /benefits
+Major component
+Component Intract
+Tool install
+Hello world demo
+
+Afrtifact version
+Change logs
+Documentation
+Javadocs
+Reports
+
+  	<directory>
+  	C:\Users\qxz1mm1\eclipse-workspace\more-moven-example\production
+  	</directory>
+  <profiles>
+  	<profile>
+  		<id>production</id>
+  		<activation>
+  		<property>
+  			<name>env.PACKAGE_ENV</name>
+  			<value>PROD</value>
+  		</property>
+  		</activation>
+  	</profile>
+  </profiles>
+
+mvn dependency:copy-dependencies
+https://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout.html
+super pom
+maven\apache-maven-3.2.5\lib\maven-model-builder-3.2.5.jar\org\apache\maven\model\
+mvn help:effective-pom
+mvn archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.5 -DinteractiveMode=false
+<scope>test</scope>
+<scope>compile</scope>
+mvn -X compile
+mvn -X test
+
+====phase in life-cycle====
+mvn help:describe -Dcmd=clean
+mvn help:describe -Dcmd=deploy
+mvn clean install
+
+complie
+Test-compile
+Test
+Package
+Install
+Deploy
+mvn compiler:compile
+mvn help:describe -Dplugin=compiler
+mvn compiler:help -Ddetail=true -Dgoal=compile
+mvn compiler:compile -Dmaven.compiler.verbose=true
+
+mvn archetype:create -DgroupId=com.infiniteskills.maven -DartifactId=first-custom-plugin -DarchetypeGroupId=org.apache.maven,archetypes -DarchetypeArtifactId=maven-archetype-mojo
+mvn install
+mvn com.infiniteskills.maven:first-custom-plugin:touch
+
+https://youtu.be/uAQs-YXnY-U
+
+dependencies(3rd party lib/maven local repositories, db,selinium,test), 
+pluginns(proj configuration/compiler/run)
+maven repote repositories(mvnrepositories)
+report/documentation
+packaging
+validate/Compile/Test/Packing/Integration/VErify/Install/Deploy
+https://mvnrepository.com/ TestNG/mysql
+
+https://automationstepbystep.com/jmeter-beginner/
+mapReduce
+fork and join
+return Objects.hash(name,age);
+
+if(this == o) return true;
+if(o == null || getClass != o.getClass()) retrun false;
+Person person = (Person) o;
+retrun name.equals(person.name) && age=person.age;
+
+1. Given a sentence, find and print the frequency of each word.
+2. Given a list of integers, find out all the numbers starting with 1.
+3. Given a list of names, group them by their first letter, and then count the number of names in each group.
+4. Find and print duplicate numbers in an array if it contains multiple duplicates?
+5. How are duplicates removed from a given array in Java?
+6. Given a list of words, filter and print the palindromes
+7. How do you merge two sorted arrays into a single sorted array?
+8. Given two lists of strings, concatenate them and remove duplicates.
+9. Student Grade Classification - 70 and above pass
+10. Given a list of strings, sort them according to increasing order of their length.
+12.Partition a list of numbers into two groups: even and odd, using a custom predicate.
+13. Find the squares of the first three even numbers in a list.
+14. Flatten a list of lists
+https://github.com/VarshaDas/Java-Code-Snippets/blob/main/LambdasAndStreams/src/main/java/StreamsCodePart2
+https://youtu.be/1gXFrh9PBic?list=PLUDwpEzHYYLvTPVqVIt7tlBohABLo4gyg
+https://youtu.be/HwwXiCf-nOM
+You
+3:19 PM
+Kadane's algorithm
+Hover over a message to pin it
+keep
+key clock/ active directive
+Akshay Rastogi
+3:28 PM
+https://medium.com/@itsmynameangad/java-build-your-own-custom-executorservice-threadpool-213e46159326
+https://medium.com/codex/executorservice-internal-working-in-java-7b286882f54e
+santosh kumar
+3:45 PM
+private static void maxProfit(int[] prices) {
+        int maxProfit = 0;
+        int buy = prices[0];
+        for (int j = 1; j < prices.length; j++) {
+            if (prices[j] > buy) {
+                maxProfit = Math.max(maxProfit, prices[j] - buy);
+            }
+            else {
+                buy = prices[j];
+            }
+        }
+        System.out.println(maxProfit);
+    }
+Akshay Rastogi
+4:03 PM
+Pow(x, n)
+Medium
+Valid Perfect Square
+
+a=[5,2,6,1,4]
+a=[3,5,1,7,4,9,3]
+a={3,1,4,8,7,2,5}
+Thread Pool executor
+https://medium.com/@itsmynameangad/java-build-your-own-custom-executorservice-threadpool-213e46159326
+https://medium.com/codex/executorservice-internal-working-in-java-7b286882f54e
+function.identity() in java
+
+Kadane's algorithm
+https://www.youtube.com/watch?v=5T0SiJocPCI
+https://leetcode.com/problems/maximum-profit-in-job-scheduling/description/
+hackerearth
+leetcode
+codeforces
+Linear and Binary Search 
+https://youtu.be/5h_wcuRl7kE
+
+https://youtu.be/xxVwdMwHPqg  Builder Design Pattern for Beginners with easy examples | Low Level System Design
+https://youtu.be/t2HmF3Y4WgY  Factory Design Pattern | Abstract Factory Pattern for Beginners with easy examples
+https://www.javatpoint.com/abstract-factory-pattern
+https://youtu.be/7g9S371qzwM DIFFERNCE BETWEEN FACTORY AND ABSTRACT FACTORY
+
+STATE DESIGN PATTERN https://youtu.be/wOXs5Z_z0Ew
+Behaviourl pattern
+https://www.youtube.com/watch?v=DBDnUkTobaE&t=252s
+
+State Pattern: allows an object to alter its behavior when its internal state changes (Wending Machince)
+               allows an object to alter its behavior when its internal state changes.
+Product	Has-a	State (Interface) Is-a(inheritence)   State 1 State 2 State 3
+State productState
+Observer Patter: in this an object(Observable) maintains a list of its dependents (observers) and notifies them of any changes in its state
+Strategy Pattern: help to define multiple algorithms for the task and we can select any algorithms depending on the situation PayStrategy ( CreditCard/ UPI Paymetn/ Cash Payment
+Chain of Responsibility: allows multipe objects to handle a request without the sender needing to know which object will ultimately process it.
+Template Method Pattern: when you want all classes to follow specific steps to process the tasks but provide flexibility that each class can have their own logic in that specific step.
+Interpreter Pattern: Defines a grammer(CONTEXT) for interpreting and evaluating an expression.
+Command Pattern: Turns requests (commands) into objects, allowing you to either parameterized or queue them
+This will help to decouple the request Sender and receiver.
+Iterator pattern provide a way to access element of a Collection sequentially without exposing underline representation of the collection.
+Visitor Pattern: Allows adding new operations to existing classes without modifying then and encourage OPEN/CLOSE principle.
+Mediator Pattern: It encourage loose coupling by kepping ojects from reffering to each explicitly and allows them to communicate throght a mediator object.
+Memento Pattern: Provides an ability to revert an object to previous state i.e. UNDO capability and it doesn't
+
+HOW TO REMEMBER
+https://www.codeproject.com/Tips/57578/The-best-way-to-remember-design-patterns
+DESIGN PATTERN
+https://youtu.be/ASI0TfcY_7U SINGLETON DAILY CODE
+https://youtu.be/zAByFmRs6No BUILDER PATTERN
+
+QUEUE https://youtu.be/PvDoT79oHTs
+STACK https://youtu.be/fptlqsesjxY
+
+Chache
+App Data
+DB 
+
+Read Through
+Write Through
+Write Ahead DB update Chache
+Write Behind 
+
+Master Worker
+Segregation pattern
+
+Push the msg in Queue
+
+https://youtu.be/4aYvLz4E1Ts  java Thread
+https://engineeringdigest.medium.com/multithreading-in-java-39f34724bbf6
+
+https://www.sql-practice.com/
+https://youtu.be/vz6vSZRuS2M Java Memory Management and Garbage Collection in Depth
+Topics which i have covered:
+============================
+
+Two type of memory - STACK , HEAP Manage by JVM
+STACK - temp variable (defined inside a block), primitive type,
+reference of object.
+Each thread have separate STACK memory.
+StackoverflowError - if stack memory full.
+
+Stack
+
+memo block
+[
+
+strLit
+personObj
+primVar =10
+]
+
+
+Heap
+[
+string pool [24]
+
+MemoObj()
+Person()
+]
+
+minor GC, major GC, age Thersold
+Yng Gen, S0, S1 (Serviver space) /Old Gen, permgen(part of heap and not expandable) (Meta space)
+Non Heap (Meta space) - Class variable (static), Class metadata (Info abt class), Constant, Meta data is expandable
+
+Mark & Sweep
+Mark & Sweep with Compact (arrange)
+Serial GC
+Parallel GC
+Concurrent Mark & Sweep
+
+G1 was first introduced in Java 7, but became the default in Java 9 
+
+Yes, Epsilon GC is available in JDK 11:
+What it is
+Epsilon GC is an experimental, no-op garbage collector that allocates memory but doesn't perform any memory reclamation.
+When to use it
+It's designed for use cases where garbage collection is not required or can be eliminated, such as for performance testing, short-lived applications, or applications that manage memory explicitly.
+How to use it
+To use Epsilon GC, you need to specify the following two runtime switches on the command line:
+-XX:+UnlockExperimentalVMOptions
+-XX:+UseEpsilonGC
+
+Yes, Shenandoah GC is available in Java versions 8, 11, and 12 and later:
+OpenJDK 8: Shenandoah GC is available as an experimental feature
+OpenJDK 11: Shenandoah GC is available as an experimental feature
+OpenJDK 12 and later: Shenandoah GC is available as a production feature 
+
+
+Type of Memory (Stack and Heap)
+What kind of data is Stored in Stack and Heap with Example
+Types of References
+Strong Reference
+Weak Reference
+Soft Reference
+Heap Memory Structure
+Young Generation
+Eden
+Survivor (S0 and S1)
+Old Generation
+Metaspace 
+How Garbage Collector work & clean up the Heap memory with Example
+Types of Garbage Collector
+Single GC
+Parallel GC
+CMS (Concurrent Mark and Sweep)
+G1 GC
+https://youtu.be/QovOdd80A4s TIME COMPLEXITY
+
+https://youtu.be/aOen1-pQLZg 
+https://youtu.be/6O5iJ7PKUhs
+Microservices Architecture Patterns | SAGA Choreography Explained & Project Creation | JavaTechie
+Spring WebFlux
+Apache Kafka
+Spring Cloud Stream
+Java 8
+Multimodule project:/ Reuse component classed
+
+Orchestration Design Pattern | Distributed Transaction Management| MicroService Design Patterns	
+https://www.youtube.com/watch?v=J3sh3IeLFh0
+https://youtu.be/YGnpHZcuMOo
+
+How to immutable class
+sync method call sleep will give other thread waiting thread will execute or not.
+creational structural behavioural (3 expamle of each)
+Best/Avg/worst time complexity/space complexity of Array/ Linked List. Write it.
+Difference between Error/ Excpetion / Checked/ Unchecked / Custom Excpetion is checked/uncheck.
+why Stram API when we have Collection 
+how singleton work in case of serialization/deserialization
+
+
+It seems you might be referring to Java's Integer::sum method. This method is used to sum two individual integers, not a list of numbers.
+To sum a list of numbers in Java, you can use streams and the collect() terminal operation:
+
+import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+public class SumList {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+        
+        int sum = numbers.stream()
+                         .collect(Collectors.summingInt(Integer::intValue));
+
+        System.out.println("Sum of the list: " + sum);
+    }
+}
+
+package com.bmw.beamapis.exam;
+
+public class MainTest {
+
+    static {
+        System.out.println("static block");
+    }
+
+
+
+    MainTest(){
+        System.out.println("Constructor");
+    }
+
+    public static void main(String[] args) {
+        MainTest m = new MainTest();
+        System.out.println("main method");
+    }
+
+    {
+        System.out.println("initialize");
+    }
+}
+
+
+A. 
+static block
+main method
+
+B.
+static block
+initialize
+Constructor
+main method
+
+Choose from the below options
+
+public class LoggerExample {
+    private StringBuilder contents = new StringBuilder();
+    public void log(String message){
+        contents.append(System.currentTimeMillis());
+        contents.append(": ");
+        contents.append(Thread.currentThread().getName());
+        contents.append(message);
+        contents.append("\n");
+    }
+
+    public String getContents(){
+        return contents.toString();
+    }
+}
+
+A. THIS CLASS IS ALREADY THREAD SAFE
+B. REPLACING STRINGBUILDER WITH STRINGBUFFER WILL MAKE THIS CLASS THREAD-SAFE
+C. SYNCHRONIZED THE LOG METHOD ONLY
+D. SYNCHRONIZED THE GETCONTENTS METHOD ONLY
+E. SYNCHRONIZED THE LOG AND GETCONTENTS METHOD ONLY
+F. THIS CLASS CONNOT BE MADE THREAD-SAFE
+ANS. B
+
+
+VALID METHODSORTERS PROVIDED BY JUNIT
+A. METHODSORTER.DEFAULT
+B. METHODSORTER.JVM
+C. METHODSORTER.NAME_ASCENDING
+D. METHODSORTER.NAME_DESCENDING
+ANS: B, C
+
+THE METHOD IN TESTSUITE CLASS THAT RETURNS THE FAILED TESTS AND LOGS WARNING MESSAGE IS
+A. STATIC TEST SHOWWARNING(STRING MESSAGE)
+B. STATIC TEST WARNING(STRING MESSAGE)
+C. STATIC TEST DISPLAYWARNING(STRING MESSAGE)
+D. STATIC TEST GETWARNING(STRING MESSAGE)
+ANS A.
+
+WHICH METHOD IN TESTRESULT CLASS GIVES THE COUNT OF DETECTED ERRORS?
+A. INT ERRORCOUNT()
+B. INT GETERRORCOUNT()
+C. INT COUNTERRORS()
+D. INT GETERRORS()
+ANS GETFAILURECOUNT/ GETERRORCOUNT
+
+CAN YOU AUTOWIRE BYTYPE WHEN MORE THAN ONE BEAN WITH THE SAME TYPE EXIST?
+A. FALSE
+B. TRUE
+ANS. A. FALSE
+IMAGINE THAT THERE ARE TWO EXCEPTION CLASSED MYBASEBUSINESSEXCEPTION AND MYSUBBASEBUSINESSEXCEPTION WHICH EXTENDS FROM MYBASEBUSINESSEXCEPTION. IF ROLLBACK-FOR ="MYBASEBUSINESSEXCEPTION" AND NO-ROLLBACK-FOR="MYSUBBASEBUSINESSEXCEPTION" ARE CONFIGURED WHAT HAPPENS WHEN A MYSUBBASEBUSINESSEXCEPTION IS THROW FROM TRANSACTION CONTEXT?
+A. NO-ROLLBACK-FOR RULE IS APPLIED AND TRANSACTION WILL NOT ROLLBACK
+B. ROLLBACK-FOR RULE IS APPLIED AND TRANSACTION WILL BE ROLLBACK
+C. EXCEPTION IS THROWN DURING APPLICATION CONTEXT INITIALIZATION SINCE CONFIGURATION IS AMBIGUOUS
+D. NONE OF THE ABOVE
+ANS -A
+
+WHICH MESSAGE CONVERTER IS USED TO CONVERT JSON REPRESENTATION TO OBJECT AND VICE VERSA IN SPRING FRAMEWORK
+A. STRINGHTTPMESSAGECONVERTER
+B. HTTPMESSAGECONVERTER
+C. MAPPINGJACKSON2HTTPXMLMESSAGECONVERTER
+D. MAPPINGJACKSON2HTTPMESSAGECONVERTER
+ANS.D 
+WHICH AMOUNG THE FOLLOWING ARE THE POPULAERLY USED APPROCHES TO VERSIONING A SPRING REST API 
+A. URI PARAMETER 
+B. CONTROLLER HEADER
+C. ACCEPT HEADER
+D. CUSTOM HEADER
+E. ALL
+F. NONE
+ANS ACD
+THE ANNOTATION IN JAX-RS API ASSIGNS A DEFAULT VALUE TO A PARAMETER PASSED TO METHOD
+A. @FORMPARAM B. @COOKIEPARAM C. @DEFAULTVALUE D. @CONTEXT ANS. C
+FUNCTIONAL INTERFACE
+WHAT IS THE BENFITS OD USING GENERICS IN YOUR CODE?
+A. IMPORVE PERFORMENCE
+B. MAKE CODE MORE READABLE
+C. ADD STABILITY TO CODE BY MAKING ERROR DETECTABLE AT COMPILE TIME
+D. ADD STABILITY TO CODE BY MAKING ERROR DETECTABLE AT RUNTIME TIME
+ANS B,C
+WHICH OF THE FOLLOWING IS A BENEFIT FROM USING @OVERRIDE ANNOTATION?
+A. OVERRISE ANNOTATION SAYS THAT THE METHOD MARKED MUST BE OVERRIDEN BY SUBCLASS
+B. IT HELPS IN RUNTIME TO DYNAMIC BINDING THE METHOD TO APPROIATE O BJECT
+C. COMPILER CAN WARN YOU IF THE METHID DESIGNED WITH OVERRIDE IS NOT A CORRECT OVERRIDE
+D. NONE OF THE ABOBE ANS -C
+BELOW REFERENCES WILL BE FINALIZED BUT MEMORY WILL NOT BE RECLAIMED AND USEFUL IN THE SCENARIO WHERE NOTIFICATION IS REQUIRED BEFORE OBJECT IS COLLECTED?
+A. STRONG REFERENCE B. SOFT REFERENCE C. WEAK REFERENCE D. PHANTOM REFERENCE ANS. D
+METHOD OF RUNTIME CALL FORCIBLY TERMINATES THE CURRENTLY RUNNING JVM == RUNTIME.GETRUNTIME.EXIT
+THREAD POOL CAN BE CREATED USING A. CALLABLE INTERFACE B. FUTURE INTERFACE C. EXECUTORS D. NONE OF THESE ANS C
+
+WHICH ONE IS TRUE
+A. A THREAD CAN CALL A NON-SYNCHRONIZED METHID OF AN OBJECT WHEN A SYNCHRONIZED METHIS IS BEING EXCUTED
+B. THREAD.SLEEP RELEASES THE LOCK
+C. TWO THREADS CAN CALL TWO DIFFERNENT SYNCHRONIZED INTANCE METHODS OF AN OBJECT
+D. WAIT KEEPS THE LOKCS
+ANS. A
+
+WHICH OF THE FOLLOWING IS ALSO CALLED HAS-A RELATIONSHIP. A. COMPOSITION B. ASSOCIATION C. AGGREGATION D. NONE OF THE ABOVE ANS. C AGGREGATION
+wHEN EXCEPTION CAN OCCUR IN JAVA CODE RUN TIME/COMPILE TIME - RUNTIME
+WHICH OF THE FOLLOWING IS NOT JAVA LEGAL IDENTIFIER GOTO, UNSIGNED, $STRING, _XYZ - GOTO
+THE ADVANTAGE OF ______ IS HTAT THEY SOLVE THE PROBLEM IF SEQUENTIAL STORAGE REPREGENTATION. BUT DISADVANTAGE IN THAT IS THEY ARE SEQUENTIAL LISTS.
+A. LIST B. LINKED LIST C. TREE D. QUEUE - ANS B 
+HOW DOES SET ENSURE THRE ARE NO DUPLICATES? HASHCODE THEN EQUALS
+Chain of Responsibility : WHICH PATTERN TO USE WHEN MORE THAN ONE OBJECT CAN HANDLE A REQUEST AND THE HANDLER IS UNKNOWN
+Command Design Pattern: WE HAVE TO DESIGN A EDITOR AND GIVE USER DIFFERNT WAYS TO OPEN A FILE LIKE OPEN BY MENU, OPEN BY TOOL AND OPEN BY EXPLORER, WHICH DESIGN PATTERN IS IT
+Factory Method: CALENDAR CLASS IS AN ABSTRACT CLASS THE GETINSTANCE METHOD INSTANTIATE GREGORAIN CALENDAR WITH DEFEULT ZONE AND LOCALE, WHICH DESIGN PATTERN IS IT
+THREAD A IS NOTIFIED OR AFTER 2 SEC
+ASSUME THE FOLLOWING METHOD IS PROPERLY SYNCHRONIZED AND CALLED FROM A THRED A ON AN OBJECT B: WAIT(2000); AFTERE CALLING THIS METHOS WHEN WILL THE THREAD A BECOME A CANDIDATE TO GET ANOTHER TURN AT THE CPU?
+IN-PLACE: ALGO LIKE QUICK SORT DOESN'T REQUIRE EXTRA MEMORY FOR CARRYING OUR THE SORTING PROCEDURE, THIS TECHNIQUE IS CALLED
+1. D
+2. A
+3. D
+4. D
+5. C
+6. A
+7. C
+8. B
+9. A
+10. C
+11. A
+12. B
+13. C
+14. A
+15. A
+16. A
+17. A
+18. D
+19. B
+20. D
+21. B
+22. D 
+23. C
+24. A
+25. B
+26. B
+27. A
+28. D
+29. B
+30. A
+31. C
+32. D
+33. C
+34. A
+35. B
+36. A
+37. A
+38. D
+39. D
+40. D
+Linked lists are data structures that are best suited for scenarios where data size is unpredictable or frequently changing. They are flexible and dynamic, and can efficiently handle insertions and deletions at arbitrary positions.
+================
+To create a new map with the same iteration order as an existing map, you should use the LinkedHashMap concrete implementation of the Map interface.
+Here's why:
+HashMap:
+Prioritizes speed and doesn't maintain any specific order for its elements.
+TreeMap:
+Orders keys by their natural ordering or a specified Comparator, resulting in a sorted iteration order different from the original map unless it was already sorted.
+LinkedHashMap:
+Maintains the insertion order of elements, ensuring the new map iterates through elements in the same order as the existing map. This makes it ideal for preserving the original iteration order.
+Therefore, if you need to preserve the existing iteration order, LinkedHashMap is the best option. It offers performance close to HashMap while maintaining the desired order.
+
+===============
+Which methods may cause a thread to stop executing?
+
+wait()
+notify()
+notifyall()
+exits synchronized code
+Answer A. wait().
+
+Table of content
+(more)
+1. The wait() may cause a thread to stop executing.
+(more)
+The wait() may cause a thread to stop executing.
+Solution
+
+Option A is correct.  The wait() method makes the active thread wait until another thread calls this object’s notify() or notifyAll() methods.
+Option B is incorrect. A single thread waiting on this object’s monitor is awakened by the notify() function.
+Option C is incorrect. Notifies every thread that is waiting on this object’s monitor by calling notifyAll().
+Option D is incorrect. The thread holding the lock or the thread in the synchronized method typically quits the synchronized method when a lock is released. The lock is released when another thread enters a synchronized procedure on that object. Does executing threads halt while entering or leaving synchronized code? Not required, as the thread can still execute unsynchronized code. The word directly in the question, in my opinion, gives us a hint. The execution of a thread is not immediately stopped when synchronized code is exited.
