@@ -1,0 +1,7608 @@
+Collectors.groupingBy, explaination
+
+In Java, when you call:
+
+future.get();
+
+on an incomplete Future, the current thread waits (blocks) until the computation finishes and the result becomes available.
+
+Example:
+
+ExecutorService executor = Executors.newFixedThreadPool(1);
+
+Future<String> future = executor.submit(() -> {
+    Thread.sleep(3000);
+    return "Done";
+});
+
+System.out.println(future.get()); // waits 3 seconds
+
+So the correct option is:
+
+Blocks until the task completes
+
+-----------------------
+The code in the image is showing two methods locking resources in different order:
+
+// Thread 1
+lock1.lock();
+try {
+    lock2.lock();
+    try {
+        // work
+    } finally {
+        lock2.unlock();
+    }
+} finally {
+    lock1.unlock();
+}
+
+// Thread 2
+lock2.lock();
+try {
+    lock1.lock();
+    try {
+        // work
+    } finally {
+        lock1.unlock();
+    }
+} finally {
+    lock2.unlock();
+}
+Problem
+Thread 1 acquires lock1 then waits for lock2
+Thread 2 acquires lock2 then waits for lock1
+
+Both threads can wait forever → deadlock
+
+Correct option:
+
+Potential deadlock due to inconsistent lock ordering
+--------------------------
+new ThreadPoolExecutor(
+    2,                  // corePoolSize
+    4,                  // maxPoolSize
+    10, TimeUnit.SECONDS,
+    new LinkedBlockingQueue<>(10)
+)
+
+What happens when 20 tasks are submitted?
+
+
+When 20 tasks are submitted to the specified , the tasks will be processed based on the configuration of the thread pool. Let's see what will happen step by step given its configuration: `ThreadPoolExecutor`
+1. **ThreadPoolExecutor Configuration**:
+    - `corePoolSize = 2`: The pool will always try to have at least 2 threads active.
+    - `maximumPoolSize = 4`: The pool can have up to 4 threads in total.
+    - `keepAliveTime = 10 seconds`: If a thread beyond the is idle for more than 10 seconds, it will be terminated. `corePoolSize`
+    - `BlockingQueue of size 10`: The queue can hold up to 10 tasks before rejecting additional tasks.
+
+2. **What Happens When 20 Tasks Are Submitted**:
+    - **First 2 tasks**: The will immediately execute the first 2 tasks with the 2 core threads. `ThreadPoolExecutor`
+    - **Next 10 tasks (from 3 to 12)**: These will be placed in the **blocking queue**, which can hold up to 10 tasks.
+    - **Tasks 13 to 14**: Since the queue is full, the thread pool will create up to 2 additional threads (to reach the `maximumPoolSize` of 4) to handle these tasks, executing them immediately.
+    - **Tasks 15 to 20**: At this point:
+        - The 2 core threads and 2 additional threads (max pool size) are all busy executing tasks.
+        - The queue is full with 10 tasks waiting to be executed.
+        - New tasks (tasks 15 to 20) cannot be accepted.
+        - The thread pool will invoke its **rejection policy** for these tasks.
+
+3. **Rejection Policy**: The default rejection policy of is , which throws a for any task that cannot be submitted. If you have not specified a custom rejection handler, the submission of tasks 15 to 20 will result in . `ThreadPoolExecutor``AbortPolicy``RejectedExecutionException``RejectedExecutionException`
+
+### Summary of Task Handling
+1. Tasks **1 to 2**: Executed by the 2 core threads immediately.
+2. Tasks **3 to 12**: Queued in the blocking queue.
+3. Tasks **13 to 14**: Handled by 2 additional threads, reaching the maximum pool size of 4.
+4. Tasks **15 to 20**: Rejected with (if no custom rejection handler is provided). `RejectedExecutionException`
+
+Let me know if you want to explore rejection policies or customize this behavior.
+
+
+
+hashmap upgrades on or after java 8
+
+
+["apple", "banana", "avocado", "apricot", "mango", "blueberry"]
+{"A":["avocado","apricot","apple"], "B":["blueberry","banana"], "M":["mango"]}
+
+class TextUses {
+	public static void main(String [] args) {
+		List<String> fruits = Arrays.asList("apple", "banana", "avocado", "apricot", "mango", "blueberry");	
+		Map<String, List<String>> map = fruits.stream().collect(Collectors.gruopingBy(s-> s.char(0), s));
+	}
+}
+Livelock
+@CompositeKey data jpa
+
+Bubble, Glide, Webflow, Bolt & Replit
+
+
+https://www.youtube.com/results?search_query=amigoscode+java+streams&utm_source=chatgpt.com
+https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html?utm_source=chatgpt.com
+https://www.youtube.com/watch?v=xifdVmHOAWc&list=PL63BDXJjNfTElajNCfg_2u_pbe1Xi7uTy
+
+How do you prevent deadlock?
+
+Best concise answer:
+
+1. Maintain consistent lock ordering
+2. Use tryLock with timeout
+3. Minimize nested synchronization
+4. Avoid circular dependency between threads
+
+
+STREAM OPERATIONS
+=======STREAM OPERATIONS==========
+
+FILTERING
+---------
+filter(Predicate)
+map(Function)
+flatMap(Function)
+distinct()
+sorted()
+sorted(Comparator)
+limit(long)
+skip(long)
+peek(Consumer)
+
+MATCHING
+--------
+anyMatch(Predicate)
+allMatch(Predicate)
+noneMatch(Predicate)
+
+FINDING
+-------
+findFirst()
+findAny()
+
+TERMINAL
+--------
+forEach(Consumer)
+forEachOrdered(Consumer)
+count()
+min(Comparator)
+max(Comparator)
+reduce(BinaryOperator)
+reduce(identity, BinaryOperator)
+reduce(identity, mapper, BinaryOperator)
+
+COLLECTION
+----------
+collect(Collector)
+toList()                  // Java 16+
+toArray()
+toArray(IntFunction)
+
+PRIMITIVE STREAMS
+-----------------
+mapToInt(ToIntFunction)
+mapToDouble(ToDoubleFunction)
+mapToLong(ToLongFunction)
+
+boxed()
+
+COLLECTORS
+==========
+
+BASIC
+-----
+Collectors.toList()
+Collectors.toSet()
+Collectors.toCollection(Supplier)
+
+STRING
+------
+Collectors.joining()
+Collectors.joining(delimiter)
+Collectors.joining(delimiter, prefix, suffix)
+
+COUNT/SUM/AVG
+-------------
+Collectors.counting()
+
+Collectors.summingInt(ToIntFunction)
+Collectors.summingDouble(ToDoubleFunction)
+Collectors.summingLong(ToLongFunction)
+
+Collectors.averagingInt(ToIntFunction)
+Collectors.averagingDouble(ToDoubleFunction)
+Collectors.averagingLong(ToLongFunction)
+
+MIN/MAX
+-------
+Collectors.maxBy(Comparator)
+Collectors.minBy(Comparator)
+
+GROUPING
+--------
+Collectors.groupingBy(Function)
+Collectors.groupingBy(Function, Collector)
+Collectors.groupingBy(Function, Supplier, Collector)
+
+PARTITION
+---------
+Collectors.partitioningBy(Predicate)
+Collectors.partitioningBy(Predicate, Collector)
+
+MAP
+---
+Collectors.toMap(keyMapper, valueMapper)
+
+Collectors.toMap(
+    keyMapper,
+    valueMapper,
+    mergeFunction
+)
+
+Collectors.toMap(
+    keyMapper,
+    valueMapper,
+    mergeFunction,
+    mapSupplier
+)
+
+MAPPING
+-------
+Collectors.mapping(Function, Collector)
+
+FILTERING (Java 9+)
+-------------------
+Collectors.filtering(Predicate, Collector)
+
+FLAT MAPPING (Java 9+)
+----------------------
+Collectors.flatMapping(Function, Collector)
+
+COLLECT AND TRANSFORM
+---------------------
+Collectors.collectingAndThen(
+    Collector,
+    Function
+)
+
+REDUCING
+--------
+Collectors.reducing(BinaryOperator)
+
+Collectors.reducing(
+    identity,
+    mapper,
+    BinaryOperator
+)
+
+STATISTICS
+----------
+Collectors.summarizingInt(ToIntFunction)
+Collectors.summarizingDouble(ToDoubleFunction)
+Collectors.summarizingLong(ToLongFunction)
+
+JAVA 12+
+--------
+Collectors.teeing(
+    collector1,
+    collector2,
+    merger
+)
+
+COMMON COMPARATORS
+==================
+
+Comparator.naturalOrder()
+Comparator.reverseOrder()
+
+Comparator.comparing(Function)
+
+Comparator.comparingInt(ToIntFunction)
+Comparator.comparingDouble(ToDoubleFunction)
+Comparator.comparingLong(ToLongFunction)
+
+.reversed()
+
+.thenComparing(Function)
+
+COMMON METHOD REFERENCES
+========================
+
+Class::method
+System.out::println
+String::length
+Integer::sum
+List::stream
+Map.Entry::getKey
+Map.Entry::getValue
+
+COMMON OPTIONAL METHODS
+=======================
+
+orElse(value)
+orElseGet(Supplier)
+orElseThrow()
+ifPresent(Consumer)
+isPresent()
+
+=======================
+
+OTHER COMMON FUNCTIONAL INTERFACES USED IN STREAMS
+=================================================
+
+COMPARATOR<T>
+-------------
+Used for sorting/comparison
+
+Syntax:
+(a, b) -> ...
+
+Examples:
+(a, b) -> a - b
+(a, b) -> b.compareTo(a)
+
+Method Reference:
+Comparator.naturalOrder()
+Comparator.reverseOrder()
+
+Used In:
+sorted(Comparator)
+max(Comparator)
+min(Comparator)
+maxBy(Comparator)
+minBy(Comparator)
+
+
+BINARYOPERATOR<T>
+-----------------
+Takes 2 same-type args and returns same type
+
+Syntax:
+(a, b) -> ...
+
+Examples:
+(a, b) -> a + b
+(a, b) -> a > b ? a : b
+
+Method Reference:
+Integer::sum
+String::concat
+
+Used In:
+reduce(BinaryOperator)
+Collectors.reducing(BinaryOperator)
+
+
+UNARYOPERATOR<T>
+----------------
+Takes 1 arg and returns same type
+
+Syntax:
+a -> ...
+
+Examples:
+a -> a * 2
+s -> s.toUpperCase()
+
+Used In:
+rare in streams directly
+
+
+BICONSUMER<T,U>
+---------------
+Takes 2 args, returns nothing
+
+Syntax:
+(a, b) -> ...
+
+Examples:
+(k, v) -> System.out.println(k + v)
+
+Used In:
+Map.forEach(BiConsumer)
+
+
+BIFUNCTION<T,U,R>
+-----------------
+Takes 2 args and returns result
+
+Syntax:
+(a, b) -> ...
+
+Examples:
+(a, b) -> a + b
+(name, age) -> new Person(name, age)
+
+Used In:
+Map.compute()
+Map.merge()
+
+
+BIPREDICATE<T,U>
+----------------
+Takes 2 args and returns boolean
+
+Syntax:
+(a, b) -> condition
+
+Examples:
+(a, b) -> a.equals(b)
+(a, b) -> a > b
+
+Less common in streams
+
+
+INTFUNCTION<R>
+--------------
+Takes int and returns object
+
+Syntax:
+value -> ...
+
+Examples:
+size -> new String[size]
+
+Used In:
+toArray(IntFunction)
+
+Example:
+stream.toArray(String[]::new)
+
+
+TOINTFUNCTION<T>
+----------------
+Converts object to int
+
+Syntax:
+obj -> intValue
+
+Examples:
+e -> e.getAge()
+
+Used In:
+mapToInt()
+summingInt()
+averagingInt()
+comparingInt()
+
+
+TODOUBLEFUNCTION<T>
+-------------------
+Converts object to double
+
+Syntax:
+obj -> doubleValue
+
+Examples:
+e -> e.getSalary()
+
+Used In:
+mapToDouble()
+summingDouble()
+averagingDouble()
+comparingDouble()
+
+
+TOLONGFUNCTION<T>
+-----------------
+Converts object to long
+
+Syntax:
+obj -> longValue
+
+Examples:
+e -> e.getPopulation()
+
+Used In:
+mapToLong()
+summingLong()
+
+
+INTPREDICATE
+------------
+Takes primitive int, returns boolean
+
+Syntax:
+value -> condition
+
+Example:
+n -> n % 2 == 0
+
+Primitive specialization
+
+
+INTCONSUMER
+-----------
+Consumes primitive int
+
+Syntax:
+value -> ...
+
+Example:
+n -> System.out.println(n)
+
+
+LONGCONSUMER
+------------
+Consumes primitive long
+
+Syntax:
+value -> ...
+
+DOUBLECONSUMER
+--------------
+Consumes primitive double
+
+Syntax:
+value -> ...
+
+
+CALLABLE<V>
+-----------
+Returns value and can throw exception
+
+Syntax:
+() -> value
+
+Example:
+() -> "Hello"
+
+Used in multithreading
+
+
+RUNNABLE
+--------
+No arg, no return
+
+Syntax:
+() -> ...
+
+Example:
+() -> System.out.println("Task")
+
+Used in threads
+
+
+COMMON SUPPLIERS
+================
+
+ArrayList::new
+HashMap::new
+TreeMap::new
+LinkedHashMap::new
+HashSet::new
+
+Used In:
+toCollection()
+groupingBy(..., Supplier, ...)
+toMap(..., Supplier)
+
+
+COMMON MERGE FUNCTIONS
+======================
+
+(a, b) -> a
+(a, b) -> b
+Integer::sum
+Double::sum
+
+Used In:
+Collectors.toMap(..., mergeFunction)
+
+
+COMMON COMPARATOR CHAINS
+========================
+Comparator.comparing(Employee::getName)
+Comparator.comparing(Employee::getSalary).reversed()
+Comparator.comparing(Employee::getDept).thenComparing(Employee::getSalary)
+Map.Entry.comparingByKey()
+Map.Entry.comparingByValue()
+
+
+
+
+
+
+
+================STREAM OPERATIONS===========
+
+orders(order_id, customer_id, amount, status, created_at)
+Find customers with: more than 5 FAILED orders, within last 7 days.
+
+Select customer_id, count(status) tot from orders where status ="FAILED" group by customer_id having tot>5 
+ 
+
+SELECT
+    customer_id,
+    COUNT(*) AS failed_order_count
+FROM orders
+WHERE status = 'FAILED'
+  AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+GROUP BY customer_id
+HAVING COUNT(*) > 5;
+
+
+class Transaction {    String transactionId;    String customerId;    String status;    double amount;}
+Using Java Streams:
+filter FAILED transactions,
+group by customerId,
+calculate total failed amount per customer,
+return top 3 customers by failed amount.
+
+=====================
+java problem to solve "Double dimension array contains word and need to search a word in the array and return the coordinates".
+
+
+//keys is ascending and values in descending order
+["apple", "banana", "avocado", "apricot", "mango", "blueberry"]
+{"A":["avocado","apricot","apple"], "B":["blueberry","banana"], "M":["mango"]}
+
+class TakeUses {
+    public static void main(String[] args) {
+
+        List<String> words = Arrays.asList("apple", "banana", "avocado","apricot", "mango", "blueberry");
+
+        //groupingBy(how to group, what map to use, how values should be collected)
+        //collectingAndThen(Collectors, Function);
+        Map<String, List<String>> result =
+                words.stream()
+                        .collect(Collectors.groupingBy(
+                                s -> s.substring(0, 1).toUpperCase(),
+                                TreeMap::new, // keys in ascending order
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        list -> list.stream()
+                                                .sorted(Comparator.reverseOrder()) // values in descending order
+                                                .toList()
+                                )
+                        ));
+
+        System.out.println(result);
+    }
+}
+
+        Map<String, List<Employee>> emps = employees.stream().collect(Collectors.groupingBy(
+                e -> e.department,
+                Collectors.collectingAndThen(
+                        Collectors.maxBy(Comparator.comparing(Employee::getSalary)),
+                        maxEmp -> maxEmp.stream().toList()
+                )
+        ));
+
+// Accumulate names into a List
+List<String> list = people.stream()
+  .map(Person::getName)
+  .collect(Collectors.toList());
+
+// Accumulate names into a TreeSet
+Set<String> set = people.stream()
+  .map(Person::getName)
+  .collect(Collectors.toCollection(TreeSet::new));
+
+// Convert elements to strings and concatenate them, separated by commas
+String joined = things.stream()
+  .map(Object::toString)
+  .collect(Collectors.joining(", "));
+
+// Compute sum of salaries of employee
+int total = employees.stream()
+  .collect(Collectors.summingInt(Employee::getSalary));
+
+// Group employees by department
+Map<Department, List<Employee>> byDept = employees.stream()
+  .collect(Collectors.groupingBy(Employee::getDepartment));
+
+// Compute sum of salaries by department
+Map<Department, Integer> totalByDept = employees.stream()
+  .collect(Collectors.groupingBy(Employee::getDepartment,
+                                 Collectors.summingInt(Employee::getSalary)));
+
+// Partition students into passing and failing
+Map<Boolean, List<Student>> passingFailing = students.stream()
+  .collect(Collectors.partitioningBy(s -> s.getGrade() >= PASS_THRESHOLD));
+
+        // Grouping by region, then department, and summing salaries
+        Map<String, Map<String, Double>> result = employees.stream().collect(
+                Collectors.groupingBy(
+                        Employee::getRegion, // First-level grouping by region
+                        Collectors.groupingBy(
+                                Employee::getDepartment, // Second-level grouping by department
+                                Collectors.summingDouble(Employee::getSalary) // Summing salaries
+                        )
+                )
+        );
+
+
+class CollectorsUses {
+
+    final static int PASS_THRESHOLD = 75;
+    static void main() {
+
+        List<Object> things = Arrays.asList(1, "apple", 3.14, 'A', true);
+        List<Employee> employees = Arrays.asList(
+                new Employee("rajan","IT", 5000),
+                new Employee("rajan","IT", 5000)
+        );
+
+        List<StudentD> students = Arrays.asList(new StudentD("ravi",80),
+                new StudentD("hari",70));
+
+        // Convert elements to strings and concatenate them, separated by commas
+        String joined = things.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(", "));
+
+        List<Persononal> people = Arrays.asList(new Persononal("ravi"));
+        List<String> list = people.stream().map(Persononal::getName).toList();
+        Set<String> stringSet = people.stream().map(Persononal::getName).collect(Collectors.toSet());
+        //.collect(Collectors.toList())
+
+        // Compute sum of salaries of employee
+        double total = employees.stream()
+                .collect(Collectors.summingDouble(Employee::getSalary));
+
+        // Group employees by department
+        Map<String, List<Employee>> byDept = employees.stream()
+                .collect(Collectors.groupingBy(Employee::getDepartment));
+
+        // Compute sum of salaries by department
+        Map<String, Double> totalByDept = employees.stream()
+                .collect(Collectors.groupingBy(Employee::getDepartment,
+                        Collectors.summingDouble(Employee::getSalary)));
+
+        // Partition students into passing and failing
+        Map<Boolean, List<StudentD>> passingFailing = students.stream()
+                .collect(Collectors.partitioningBy(s -> s.getGrade() >= PASS_THRESHOLD));
+        System.out.println(passingFailing);
+
+        // Grouping by region, then department, and summing salaries
+        /*Map<String, Map<String, Double>> result = employees.stream().collect(
+                Collectors.groupingBy(
+                        Employee::getRegion, // First-level grouping by region
+                        Collectors.groupingBy(
+                                Employee::getDepartment, // Second-level grouping by department
+                                Collectors.summingDouble(Employee::getSalary) // Summing salaries
+                        )
+                )
+        );*/
+
+
+    }
+}
+
+
+N+1 probelm
+Deadlock and prevention
+Session hijack
+
+public static int test() {
+    try {
+        int x = 10 / 0;
+        return 1;
+    } catch (Exception e) {
+        return 2;
+    } finally {
+        return 3;
+    }
+}
+
+
+["apple", "banana", "avocado", "apricot", "mango", "blueberry"]
+{"A":["avocado","apricot","apple"], "B":["blueberry","banana"], "M":["mango"]}
+
+class TextUses {
+	public static void main(String [] args) {
+		List<String> fruits = Arrays.asList("apple", "banana", "avocado", "apricot", "mango", "blueberry");	
+		Map<String, List<String>> map = fruits.stream().collect(Collectors.gruopingBy(s-> s.char(0), s));
+	}
+}
+Data Encapsulation, what happend if we define protect or public?
+Deadlock and two overcome this?
+Livelock
+@CompositeKey data jpa
+
+class PlusUses {
+    static void main() {
+        List<String> names = Arrays.asList("Tom", "Jerry", "Spike");
+
+        Function<String,Integer> func = String::length;
+        Consumer<Object> cons = System.out::println;
+
+        names.stream()
+                .map(func)
+                .forEach(cons);
+    }
+}
+
+class TakeUses {
+
+    static void main() {
+        String data = "I am learning Streams API in Java";
+        String text  = "hello";
+
+        //max(Comparator) || comparing(Function) || method-reference: String::length || s -> s.length()
+        //Function<String, Integer> func = String::length;
+        //int len = func.apply("Hello");  ||  s -> s.length()  ||   () -> text.toUpperCase()
+
+        //Function<String, Integer> func = String::length;
+        //Function<String, String> func2 = String::toUpperCase;
+        Supplier<String> supplier = text::toUpperCase;
+        Function<String, Integer> func3 = s -> s.length();
+        Comparator<String> comparing = Comparator.comparing(func3);
+
+        Supplier<ArrayList<String>> listSupplier = ArrayList::new; // () -> new ArrayList<>();
+        List<String> list = listSupplier.get();
+
+        String ans = Arrays.stream(data.split(" "))
+                .max(comparing).get();
+
+        System.out.println(supplier.get());
+        System.out.println(ans);
+    }
+}
+
+
+
+
+Event-Driven और Asynchronous Microservice Architecture
+With Queues, Worker Consumers, Provider Abstraction Layer, Retry/DLQ Mechanism और Docker/Kubernetes आधारित Containerized Deployment
+मुख्य उद्देश्य Scalability, Extensibility, Fault Tolerance और नए Notification Providers को आसानी से Integrate करना होगा
+
+मैं Notification Service को Event-Driven और Asynchronous Microservice Architecture के आधार पर डिज़ाइन करूंगा, जिसमें Queues, Worker Consumers, Provider Abstraction Layer, Retry/DLQ Mechanism और Docker/Kubernetes आधारित Containerized Deployment का उपयोग होगा। इस डिज़ाइन का मुख्य उद्देश्य Scalability, Extensibility, Fault Tolerance और नए Notification Providers को आसानी से Integrate करना होगा, बिना Existing Business Logic को प्रभावित किए।”
+
+What is retry/DLQ in kafka, how to configure it?
+Interview Answer (Short Version)
+“Kafka में Retry mechanism failed messages को दुबारा process करने के लिए use होता है। Usually हम retry topics और exponential backoff strategy use करते हैं। अगर message multiple attempts के बाद भी fail हो जाए, तो उसे DLQ (Dead Letter Queue) topic में भेज दिया जाता है ताकि system block ना हो और failed messages later analyze या replay किए जा सकें। Spring Kafka में इसे @RetryableTopic या custom retry topics के through configure किया जा सकता है।”
+
+Interview Short Answer
+“Idempotency का मतलब है कि same request multiple times execute होने पर भी system duplicate result produce ना करे। Notification systems में यह duplicate emails/SMS रोकने के लिए जरूरी होता है, especially retries और Kafka reprocessing scenarios में। Usually unique request ID या idempotency key store करके check किया जाता है कि request पहले process हुई है या नहीं।”
+
+
+“मैं Notification System को इस तरह डिज़ाइन करूंगा कि Object Creation के लिए Factory Pattern का उपयोग होगा और हर Channel (Email, SMS, Push) के अलग-अलग व्यवहार के लिए Strategy Pattern का उपयोग किया जाएगा। SendGrid या SES जैसे हर Provider को Adapter Pattern के जरिए integrate किया जाएगा। सिस्टम को scalable बनाने के लिए Kafka के साथ Event-Driven Architecture use किया जाएगा, और reliability के लिए Retry और DLQ (Dead Letter Queue) mechanism लगाया जाएगा। Idempotency यह सुनिश्चित करेगा कि duplicate messages न भेजे जाएं, और Circuit Breaker provider failures को handle करेगा। इस तरह यह system scalable, extensible और fault tolerant बनेगा।”
+
+1. DATA CLASS/POJO
+
+class User (
+
+private String name;
+
+private int age;
+
+public User(String name, int age) {
+
+this.name name:
+
+this.age age;
+
+}
+
+// getters and setters
+
+}
+
+2. SWITCH
+
+switch (day) {
+
+case MONDAY:
+
+return "Work";
+
+case FRIDAY:
+
+return "Fun";
+
+default:
+
+return "Rest":
+
+}
+
+3. CONCURRENCY
+
+ExecutorService executor
+
+Executors.newFixed ThreadPool(10);
+
+executor.submit(() -> process());
+
+4.STREAMS
+
+List<String> names
+
+users.stream()
+
+filter (u-> u.isActive())
+
+.map(User::getName)
+
+.collect(Collectors.tolist());
+
+---17---
+
+1. DATA CLASS / RECORDS
+
+record User (String name, int age) {}
+
+Less boilerplate, immutable by default
+
+2. SWITCH EXPRESSIONS
+
+String type switch (day) {
+
+case MONDAY: -> "Work";
+
+case FRIDAY -> "Fun";
+
+default -> "Rest";
+
+};
+
+More concise and readable
+
+3. PATTERN MATCHING (instancoef)
+
+if (obj instancocf User u) ( System.out.println(u.name());
+
+}
+
+No need for cast, cleaner code
+
+4. TEXT BLOCKS
+
+String query=
+
+SELECT
+
+FROM users
+
+WHERE active = true
+
+Multi-line strings made easy
+
+
+
+---21---
+
+
+1. DATA CLASS / RECORDS (ENHANCED USAGE)
+
+record User(String name, int age) {}
+
+Records are now widely adopted in real projects
+
+2. PATTERN MATCHING (SWITCH)
+
+String result = switch (obj) {
+
+case User u -> "User: + u.name(); case Admin a -> "Admin: + a.name(); default "Unknown"; };
+
+Powerful pattern matching in switch
+
+43. VIRTUAL THREADS (PROJECT LOOM)
+
+Thread.startVirtualThread(() -> process());
+
+Handle thousands of concurrent tasks with ease
+
+4. SEQUENCED COLLECTIONS
+
+List<String> list new ArrayList<>(List.of("A", "B"));
+
+list.addFirst("2");
+
+list.getFirst();
+
+Easier ways to work with ordered collections
+
+
+
+=========LOAD BALENCER, API GATEWAY============
+
+==================== LOAD BALANCER vs API GATEWAY ====================
+
+LOAD BALANCER (Like a Floor Manager)
+----------------------------------------------------------------------
+A Load Balancer primarily distributes traffic across multiple servers.
+
+Responsibilities:
+1. Does NOT know whether the request is from a real customer or a bot.
+2. Manages only traffic distribution.
+3. Focuses on delivery, not application-level security.
+
+Example Architecture:
+
+                         Request
+                            |
+                            v
+                   +----------------+
+                   | Load Balancer  |
+                   +----------------+
+                     /    |    |   \
+                    /     |    |    \
+               Server1 Server2 Server3 Server4
+
+
+Examples:
+- AWS ALB (Application Load Balancer)
+- NGINX
+- Kong
+
+Layer 7 Load Balancer (Smart LB):
+- Can handle path-based routing
+- Basic filtering
+- Host-based routing
+
+Example:
+- /api/users  -> User Service
+- /api/orders -> Order Service
+
+When to Use Only a Load Balancer:
+- Internal traffic
+- Early-stage applications
+- Limited public APIs
+- Simple traffic distribution
+
+
+======================================================================
+
+API GATEWAY
+----------------------------------------------------------------------
+API Gateway is a smarter version of a reverse proxy.
+
+Acts as:
+- Single Entry Point
+  Example: api.tadaka.com
+
+Main Responsibilities:
+- Authentication
+- Authorization
+- Rate Limiting
+- Routing
+- API Versioning
+- Policy Enforcement
+- Traffic Governing
+
+Examples:
+- Kong
+- Apigee
+- AWS API Gateway
+- NGINX Gateway
+
+
+======================================================================
+
+WHY API GATEWAY IS IMPORTANT
+----------------------------------------------------------------------
+
+1. Centralized Authentication
+-----------------------------
+Gateway verifies identity using:
+- JWT Tokens
+- API Keys
+- OAuth
+
+Example:
+"Who are you?"
+
+Authentication is checked at API Gateway level.
+
+
+2. Avoid Duplicate Authentication Logic
+---------------------------------------
+Without API Gateway:
+- Every microservice implements authentication separately.
+- Leads to:
+  * Duplicate code
+  * Maintenance nightmare
+  * Inconsistent security
+  * Buggy implementations
+
+Best Practice:
+- Centralize authentication at API Gateway.
+
+
+3. Authorization
+----------------
+After identity verification comes authorization.
+
+Examples:
+- Customer -> Can place orders
+- Admin    -> Can view analytics
+- Partner  -> Can use bulk APIs
+
+These authorization rules can also be enforced at the Gateway.
+
+
+4. Rate Limiting
+----------------
+Protects system from:
+- Brute-force attacks
+- Spam traffic
+- Resource exhaustion
+- API abuse
+
+Example:
+50,000 spam requests per second
+
+Solution:
+- Rate Limiting
+
+Example Rules:
+a) Anonymous Users  -> 20 requests/min
+b) Logged-in Users  -> 200 requests/min
+c) Premium Partners -> 5000 requests/min
+
+
+======================================================================
+
+SECURITY FEATURES
+----------------------------------------------------------------------
+
+1. SSL / HTTPS Management
+-------------------------
+Handled by:
+- API Gateway
+- Edge Load Balancer
+
+Responsibilities:
+- SSL certificate management
+- Rotation
+- Expiry handling
+- SSL termination
+
+
+2. Edge Protection
+------------------
+Protects against:
+- Malicious traffic
+- DDoS attacks
+
+
+3. WAF (Web Application Firewall)
+---------------------------------
+Provides deep inspection against:
+- Sophisticated attacks
+- Malicious payloads
+- Injection attacks
+
+
+======================================================================
+
+LOAD BALANCER TYPES
+----------------------------------------------------------------------
+
+1. Edge Load Balancer
+---------------------
+Responsibilities:
+- High availability
+- Request distribution
+- SSL termination
+
+
+2. Internal Load Balancer
+-------------------------
+Used for:
+- Scaling internal microservices
+- Internal service communication
+
+
+======================================================================
+
+OBSERVABILITY
+----------------------------------------------------------------------
+Since all traffic passes through one central control point,
+API Gateway provides:
+
+- Central dashboard
+- Traffic monitoring
+- Request tracing
+- Failure analysis
+
+Examples:
+- Which APIs are slow?
+- Which routes are failing?
+- Which endpoints are receiving unusual traffic?
+
+
+======================================================================
+
+WHEN NOT TO USE API GATEWAY
+----------------------------------------------------------------------
+
+Avoid API Gateway for:
+- Microservice-to-microservice internal communication
+
+Instead use a Service Mesh:
+- Istio
+- Linkerd
+
+
+======================================================================
+
+HIGH AVAILABILITY REQUIREMENT
+----------------------------------------------------------------------
+
+API Gateway should always be deployed in:
+- Clustered mode
+- Redundant setup
+
+Reason:
+Single point of failure = Entire application downtime
+
+
+======================================================================
+
+QUICK COMPARISON
+----------------------------------------------------------------------
+
+Feature                  | Load Balancer | API Gateway
+-------------------------|---------------|----------------
+Traffic Distribution     | Yes           | Yes
+Authentication           | No            | Yes
+Authorization            | No            | Yes
+Rate Limiting            | Limited       | Advanced
+API Versioning           | No            | Yes
+SSL Termination          | Yes           | Yes
+Observability            | Limited       | Strong
+Security Policies        | Minimal       | Advanced
+Internal Traffic         | Good Fit      | Usually Not Needed
+Public APIs              | Limited       | Excellent
+
+
+======================================================================
+
+SIMPLE SUMMARY
+----------------------------------------------------------------------
+
+Load Balancer:
+"Distributes traffic"
+
+API Gateway:
+"Controls, secures, monitors, and governs APIs"
+
+======================================================================
+=========LOAD BALENCER, API GATEWAY============
+
+
+===========**not null** and **not empty**============
+
+import com.tech.goal.utils.ObjectsUtils;
+
+import java.util.*;
+
+public class StsUses {
+    static void main() {
+
+        Optional<Map<String, Double>> doubleMap = Optional.ofNullable(null);
+        Map<String, String> stringMap = new HashMap<>();
+        Optional<Map<String, Integer>> optionalIntegerMap = Optional.ofNullable(null);
+        stringMap.put("A","A1");
+        String myString =  null;
+        Map<String, String> myMap = null;
+        Optional<String> optionalString = Optional.ofNullable(myString);
+        ObjectsUtils.performIfValid(optionalString, () -> System.out.println("Valid non-empty string found: " + myString));
+
+        Optional<Map<String, String>> optionalMap = Optional.ofNullable(myMap);
+        ObjectsUtils.performIfValid(optionalMap, () -> System.out.println("Valid non-empty map found."));
+        ObjectsUtils.performIfValid(optionalIntegerMap, () -> System.out.println("Valid non-empty map found."));
+
+        optionalMap
+                .filter(ObjectsUtils::isUsable) // Will ensure the Map is non-null and non-empty
+                .ifPresentOrElse(
+                        map -> System.out.println("Usable Map: " + map),
+                        () -> System.out.println("1. Optional map is either null or empty")
+                );
+
+        if(ObjectsUtils.isUsable(optionalMap)) {
+            System.out.println("Is Usable:  true");
+            System.out.println("optionalIntegerMap.get()" + optionalIntegerMap.get());
+        } else {
+            System.out.println("Optional map is either null or empty");
+        }
+
+        if(optionalIntegerMap.isPresent() && ObjectsUtils.isUsable(optionalMap)) {
+            System.out.println("Is Usable:  true");
+            System.out.println("optionalIntegerMap.get()" + optionalIntegerMap.get());
+        } else {
+            System.out.println("Optional map is either null or empty");
+        }
+
+        optionalMap.ifPresent(map -> {
+            if (ObjectsUtils.isUsable(map)) {
+                System.out.println("Is Usable: true");
+                System.out.println("optionalMap.get(): " + map);
+            } else {
+                System.out.println("Map is empty");
+            }
+        });
+
+
+        doubleMap.ifPresentOrElse(map -> {
+            if(map.isEmpty()) {
+                System.out.println("Double map empty");
+            } else {
+                System.out.println("Double map isn't empty");
+            }
+        }, () -> System.out.println("Double map is null"));
+
+        optionalIntegerMap.ifPresentOrElse(
+                map -> {
+                    if(map.isEmpty()) {
+                        System.out.println("Empty map");
+                    } else {
+                        System.out.println("Not empty map");
+                    }
+                }, ()-> System.out.println("Integer map is null")
+        );
+
+        if(optionalIntegerMap !=null &&  !optionalIntegerMap.isEmpty()){
+            System.out.println("Map isn't empty");
+        } else {
+            System.out.println("Map is empty");
+        }
+
+        if(!stringMap.isEmpty()){
+            System.out.println("Map isn't empty");
+        } else {
+            System.out.println("Map is empty");
+        }
+    }
+}
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
+public class ObjectsUtils {
+
+    public static boolean isUsable(Object obj){
+        return obj != null;
+    }
+
+    public static boolean isUsable(String obj){
+        return obj != null && !obj.isEmpty();
+    }
+
+    public static boolean isUsable(Collection<?> obj){
+        return obj != null && !obj.isEmpty();
+    }
+
+    public static boolean isUsable(Map<?, ?> obj){
+        return obj != null && !obj.isEmpty();
+    }
+
+    public static void performIfValid(Optional<?> optional, Runnable action) {
+        optional.ifPresent(value -> {
+            if (!(value instanceof String str && str.isEmpty())
+                    && !(value instanceof Collection<?> collection && collection.isEmpty())
+                    && !(value instanceof Map<?, ?> map && map.isEmpty())) {
+                action.run(); // Perform action only when valid
+            }
+        });
+    }
+
+    public static boolean isUsable(Optional<?> optional) {
+        return optional.isPresent() && isUsable(optional.get());
+    }
+}
+===========**not null** and **not empty**============
+
+
+To handle the common scenario where every object needs to be checked to ensure it is **not null** and **not empty** before performing any operations on it, we can adopt better practices provided by modern Java features and design principles. Below are some strategies to simplify and improve such null and emptiness checks in Java:
+
+---
+
+### 1. **Use Utility Methods for Common Checks**
+Create a utility class with reusable methods to handle null and empty conditions for specific object types (e.g., Collections, Strings, Optionals, etc.).
+
+```java
+import java.util.Collection;
+import java.util.Map;
+
+public class ObjectUtils {
+
+    // Checks if an object is not null and applicable for operations
+    public static boolean isUsable(Object obj) {
+        return obj != null;
+    }
+
+    // Checks if a string is neither null nor empty
+    public static boolean isUsable(String str) {
+        return str != null && !str.isEmpty();
+    }
+
+    // Checks if a collection is neither null nor empty
+    public static boolean isUsable(Collection<?> collection) {
+        return collection != null && !collection.isEmpty();
+    }
+
+    // Checks if a map is neither null nor empty
+    public static boolean isUsable(Map<?, ?> map) {
+        return map != null && !map.isEmpty();
+    }
+}
+```
+
+
+### **Usage**:
+```java
+if (ObjectUtils.isUsable(myMap)) {
+    // Perform operations on map
+}
+
+if (ObjectUtils.isUsable(myCollection)) {
+    // Perform operations on collection
+}
+
+if (ObjectUtils.isUsable(myString)) {
+    // Perform operations on string
+}
+```
+
+
+### Benefits:
+- Reusability: Wrap repeated patterns into one common place.
+- Improved readability: Code becomes more descriptive and concise.
+- Easy to update logic globally if needed.
+
+---
+
+### 2. **Use `Optional` for Better Null Handling**
+`Optional` (available since Java 8) can eliminate the need for manual null checks and provide a safer mechanism for handling potentially null objects. It can also wrap empty checks for collections or strings.
+
+#### Example of Optional Usage:
+```java
+import java.util.Optional;
+
+public class OptionalUtils {
+
+    // Performs an action only if the optional value is present and meets criteria (not empty in case of string/collection)
+    public static void performIfValid(Optional<?> optional, Runnable action) {
+        optional.ifPresent(value -> {
+            if (!(value instanceof String str && str.isEmpty())
+                && !(value instanceof Collection<?> collection && collection.isEmpty())
+                && !(value instanceof Map<?, ?> map && map.isEmpty())) {
+                action.run(); // Perform action only when valid
+            }
+        });
+    }
+}
+```
+
+
+#### **Usage**:
+```java
+Optional<String> optionalString = Optional.ofNullable(myString);
+OptionalUtils.performIfValid(optionalString, () -> System.out.println("Valid non-empty string found: " + myString));
+
+Optional<Map<String, String>> optionalMap = Optional.ofNullable(myMap);
+OptionalUtils.performIfValid(optionalMap, () -> System.out.println("Valid non-empty map found."));
+```
+
+
+### Benefits:
+- Encapsulates null and empty checks into a single safe usage API.
+- Reduces explicit null-check boilerplate and ensures developer safety.
+
+---
+
+### 3. **Leverage Java 17 Sealed Classes for Specific Use Cases**
+If you have specific objects that need checks for emptiness (e.g., Strings, Collections, Maps), sealed class hierarchies can ensure compile-time safety for these checks.
+
+#### Example:
+```java
+public sealed interface Validatable permits ValidatableString, ValidatableCollection {
+    boolean isValid();
+}
+
+public final class ValidatableString implements Validatable {
+    private final String value;
+
+    public ValidatableString(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public boolean isValid() {
+        return value != null && !value.isEmpty();
+    }
+}
+
+public final class ValidatableCollection implements Validatable {
+    private final Collection<?> collection;
+
+    public ValidatableCollection(Collection<?> collection) {
+        this.collection = collection;
+    }
+
+    @Override
+    public boolean isValid() {
+        return collection != null && !collection.isEmpty();
+    }
+}
+```
+
+
+#### **Usage**:
+```java
+Validatable stringValidator = new ValidatableString(myString);
+if (stringValidator.isValid()) {
+    System.out.println("Valid string: " + myString);
+}
+
+Validatable collectionValidator = new ValidatableCollection(myCollection);
+if (collectionValidator.isValid()) {
+    System.out.println("Valid collection: " + myCollection);
+}
+```
+
+
+### Benefits:
+- Type-safe mechanism to validate objects.
+- The sealed class approach enforces strict rules on what types can be considered "Validatable."
+
+---
+
+### 4. **Combine `Optional` and Stream API**
+For working with collections or performing operations only when objects are valid, combining `Optional` and streams can create concise logic.
+
+#### Example:
+```java
+import java.util.Collection;
+import java.util.Optional;
+
+public class StreamUtils {
+
+    // Process a collection only if it's not null and not empty
+    public static void processIfUsable(Collection<?> collection, Runnable action) {
+        Optional.ofNullable(collection)
+                .filter(c -> !c.isEmpty())
+                .ifPresent(c -> action.run());
+    }
+}
+```
+
+
+#### **Usage**:
+```java
+StreamUtils.processIfUsable(myCollection, () -> {
+    myCollection.forEach(System.out::println);
+});
+```
+
+
+### Benefits:
+- Combines readability improvements of streams with null-check safety.
+
+---
+
+### 5. **Use Java Records for Immutability Checks**
+In cases where you need to group objects (e.g., a combination of strings and collections) and ensure they are non-null and valid, make use of **records** introduced in Java 14 for immutability.
+
+#### Example:
+```java
+public record ValidatableGroup(String string, Collection<?> collection) {
+    public boolean isValid() {
+        return string != null && !string.isEmpty() 
+            && collection != null && !collection.isEmpty();
+    }
+}
+```
+
+
+#### **Usage**:
+```java
+var group = new ValidatableGroup(myString, myCollection);
+if (group.isValid()) {
+    System.out.println("String and collection are valid!");
+}
+```
+
+
+### Benefits:
+- Simpler declarations with `record`.
+- Prevents mutable state issues and keeps validation logic centralized.
+
+---
+
+### General Best Practices:
+1. **Adopt Defensive Programming**:
+   - Validate object state at the boundaries of your application (e.g., APIs, controllers).
+   - Avoid redundant checks deeper into your codebase when already validated at the entry point.
+
+2. **Fail Fast**:
+   - Use `Objects.requireNonNull()` for critical fields instead of deferring the validation to business logic.
+
+3. **Lombok for Automatic Handling** (Optional Tool):
+   - For common null or empty checks, Lombok’s `@NonNull` or custom annotations can inject validations automatically during compile time.
+
+---
+
+By combining utility methods, `Optional`, sealed class hierarchies, or records, you can simplify null and emptiness checks, improve code safety, and reduce manual boilerplate while adhering to modern Java conventions.
+
+
+====================Dispatch Servlet, FilterChain, HandlerMapping, MessageHandler to identify the controller mapping , BeanCotextAware, ApplicationContextAwere uses and its role and complete flow of spring boot application? Is this remain same flow for spring and spring boot project?
+
+Yes — the core request-processing flow is fundamentally the same in Spring Framework and Spring Boot.
+Spring Boot mainly adds:
+
+auto-configuration
+embedded server setup
+component scanning defaults
+starter dependencies
+opinionated configuration
+
+But internally, the MVC lifecycle still uses the same Spring Web MVC components like:
+
+DispatcherServlet
+HandlerMapping
+HandlerAdapter
+FilterChain
+ApplicationContext
+BeanFactory
+MessageConverter
+etc.
+1. High-Level Spring Boot Request Flow
+
+A browser/client sends:
+
+GET /users/1
+
+The request flows like this:
+
+Client
+   ↓
+Servlet Container (Tomcat)
+   ↓
+FilterChain
+   ↓
+DispatcherServlet
+   ↓
+HandlerMapping
+   ↓
+Controller Method
+   ↓
+Service Layer
+   ↓
+Repository Layer
+   ↓
+Database
+   ↓
+Response returned
+2. Complete Detailed Flow
+STEP 1 — Application Startup
+
+When Spring Boot starts:
+
+@SpringBootApplication
+public class App {
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+}
+
+Internally:
+
+SpringApplication.run()
+    ↓
+Create ApplicationContext
+    ↓
+Load Bean Definitions
+    ↓
+Create Beans
+    ↓
+Embedded Tomcat starts
+    ↓
+DispatcherServlet registered
+3. ApplicationContext vs BeanFactory
+BeanFactory
+
+Core IOC container.
+
+Responsibilities:
+
+create beans
+dependency injection
+bean lifecycle
+
+Example:
+
+BeanFactory factory;
+
+Lazy initialization by default.
+
+ApplicationContext
+
+Advanced container built on top of BeanFactory.
+
+Responsibilities:
+
+all BeanFactory features
+event publishing
+AOP support
+i18n
+resource loading
+web-aware features
+
+Example:
+
+ApplicationContext context;
+
+Spring Boot always uses ApplicationContext.
+
+4. BeanNameAware / BeanFactoryAware / ApplicationContextAware
+
+These are Aware interfaces.
+
+They allow beans to know about Spring internals.
+
+BeanNameAware
+
+Gets its Spring bean name.
+
+@Component
+public class MyBean implements BeanNameAware {
+
+    @Override
+    public void setBeanName(String name) {
+        System.out.println(name);
+    }
+}
+
+Use case:
+
+logging
+dynamic behavior
+BeanFactoryAware
+
+Gets BeanFactory object.
+
+public class MyBean implements BeanFactoryAware {
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) {
+    }
+}
+
+Use case:
+
+manually getting beans
+low-level container access
+ApplicationContextAware
+
+Gets ApplicationContext object.
+
+public class MyBean implements ApplicationContextAware {
+
+    @Override
+    public void setApplicationContext(ApplicationContext context) {
+    }
+}
+
+Use case:
+
+access all beans
+publish events
+resource loading
+When are Aware methods called?
+
+Bean lifecycle:
+
+Bean Instantiation
+   ↓
+Dependency Injection
+   ↓
+Aware methods called
+   ↓
+@PostConstruct
+   ↓
+Bean ready
+5. Embedded Tomcat Startup
+
+Spring Boot auto-starts embedded Tomcat.
+
+Equivalent traditional Spring XML:
+
+<servlet>
+   <servlet-name>dispatcher</servlet-name>
+</servlet>
+
+Boot auto-configures this.
+
+Tomcat creates:
+
+DispatcherServlet
+
+and registers it for:
+
+/
+6. Client Request Comes
+
+Example:
+
+GET /users/1
+
+Tomcat receives request.
+
+7. FilterChain Execution
+
+Before reaching Spring MVC:
+
+Servlet Filters execute
+
+Examples:
+
+Security filter
+JWT filter
+CORS filter
+Logging filter
+What is FilterChain?
+
+A sequence of filters.
+
+Request
+  ↓
+Filter1
+  ↓
+Filter2
+  ↓
+Filter3
+  ↓
+DispatcherServlet
+Example Filter
+@Component
+public class LoggingFilter implements Filter {
+
+    public void doFilter(...) {
+        System.out.println("Before");
+        chain.doFilter(request, response);
+        System.out.println("After");
+    }
+}
+8. DispatcherServlet (Front Controller)
+
+This is the heart of Spring MVC.
+
+Spring Framework uses the Front Controller Pattern.
+
+All requests come here first.
+
+Client
+   ↓
+DispatcherServlet
+
+Responsibilities:
+
+route request
+find controller
+invoke controller
+process response
+exception handling
+9. HandlerMapping Identifies Controller
+
+DispatcherServlet asks:
+
+Which controller handles /users/1 ?
+
+This is done by:
+
+HandlerMapping
+Example
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    @GetMapping("/{id}")
+    public User getUser() {
+    }
+}
+
+At startup Spring stores mapping metadata:
+
+/users/{id} → UserController.getUser()
+
+HandlerMapping searches this mapping.
+
+Common HandlerMapping Implementations
+Class	Purpose
+RequestMappingHandlerMapping	@RequestMapping
+BeanNameUrlHandlerMapping	bean-name mapping
+
+Most common:
+
+RequestMappingHandlerMapping
+10. HandlerAdapter Executes Controller
+
+Now DispatcherServlet found the handler.
+
+But controllers can have many forms.
+
+So Spring uses:
+
+HandlerAdapter
+
+to invoke controller method properly.
+
+Internally
+DispatcherServlet
+   ↓
+HandlerAdapter.invoke()
+   ↓
+Controller Method
+11. MessageConverters / MessageHandler
+
+You mentioned MessageHandler.
+
+In Spring MVC request/response conversion usually happens through:
+
+HttpMessageConverter
+
+Examples:
+
+Converter	Purpose
+MappingJackson2HttpMessageConverter	JSON
+StringHttpMessageConverter	text
+ByteArrayHttpMessageConverter	binary
+Example
+
+Controller returns:
+
+return new User();
+
+Spring converts:
+
+User object → JSON
+
+using Jackson converter.
+
+Flow
+Controller returns Object
+   ↓
+HttpMessageConverter
+   ↓
+JSON Response
+12. Service Layer
+
+Typical architecture:
+
+Controller
+   ↓
+Service
+   ↓
+Repository
+
+Example:
+
+@Service
+public class UserService {
+}
+
+Business logic lives here.
+
+13. Repository Layer
+
+Uses JPA/Hibernate.
+
+@Repository
+public interface UserRepo extends JpaRepository<User, Long> {
+}
+14. Response Flow Back
+Controller returns data
+   ↓
+MessageConverter converts to JSON
+   ↓
+DispatcherServlet
+   ↓
+FilterChain response phase
+   ↓
+Tomcat
+   ↓
+Client
+15. Exception Handling Flow
+
+If exception occurs:
+
+Controller
+   ↓
+ExceptionResolver
+   ↓
+@ControllerAdvice
+
+Example:
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+}
+16. Complete Internal Flow Diagram
+Client Request
+      ↓
+Tomcat Servlet Container
+      ↓
+FilterChain
+      ↓
+DispatcherServlet
+      ↓
+HandlerMapping
+      ↓
+HandlerAdapter
+      ↓
+Controller
+      ↓
+Service
+      ↓
+Repository
+      ↓
+Database
+
+-------------------
+
+Database Response
+      ↓
+Repository
+      ↓
+Service
+      ↓
+Controller
+      ↓
+HttpMessageConverter
+      ↓
+DispatcherServlet
+      ↓
+FilterChain
+      ↓
+Tomcat
+      ↓
+Client Response
+17. Is Flow Same in Spring and Spring Boot?
+YES — mostly same internally.
+Traditional Spring MVC
+
+You manually configure:
+
+DispatcherServlet
+Tomcat
+XML config
+Component scan
+ViewResolver
+
+Example:
+
+<servlet>
+
+WAR deployment required.
+
+Spring Boot
+
+Boot automatically configures:
+
+embedded Tomcat
+DispatcherServlet
+Jackson
+MVC config
+component scanning
+
+You only write business code.
+
+Internal MVC Engine remains SAME
+
+These remain identical:
+
+Component	Spring	Spring Boot
+DispatcherServlet	YES	YES
+HandlerMapping	YES	YES
+IOC Container	YES	YES
+Filters	YES	YES
+AOP	YES	YES
+Bean Lifecycle	YES	YES
+MVC Flow	YES	YES
+18. Key Interview Summary
+Core MVC Flow
+Request
+ → Filter
+ → DispatcherServlet
+ → HandlerMapping
+ → HandlerAdapter
+ → Controller
+ → Service
+ → Repository
+ → DB
+ → Response
+DispatcherServlet
+
+Front controller handling all requests.
+
+HandlerMapping
+
+Finds correct controller method.
+
+HandlerAdapter
+
+Executes controller method.
+
+HttpMessageConverter
+
+Converts Java objects ↔ JSON/XML.
+
+FilterChain
+
+Executes filters before/after servlet.
+
+ApplicationContext
+
+Advanced IOC container.
+
+ApplicationContextAware
+
+Gives access to Spring container.
+
+Spring vs Spring Boot
+
+Core Spring MVC lifecycle is same.
+Spring Boot only automates configuration and server setup.
+
+What is roll of these in Spring Boot. "Jackson
+MVC config"
+
+In Spring Boot, both Jackson and MVC Configuration are extremely important parts of the web layer.
+
+1. Role of Jackson in Spring Boot
+What is Jackson?
+
+Jackson is a Java library used for:
+
+Java Object  ↔  JSON
+
+It performs:
+
+Serialization → Java object → JSON
+Deserialization → JSON → Java object
+Why Spring Boot Uses Jackson
+
+When a REST controller returns an object:
+
+@RestController
+public class UserController {
+
+    @GetMapping("/user")
+    public User getUser() {
+        return new User(1, "Rahul");
+    }
+}
+
+Spring cannot directly send Java objects over HTTP.
+
+So Spring uses Jackson internally to convert:
+
+User object
+   ↓
+JSON
+
+Output:
+
+{
+  "id": 1,
+  "name": "Rahul"
+}
+Internal Flow
+Controller Return Object
+        ↓
+HttpMessageConverter
+        ↓
+Jackson ObjectMapper
+        ↓
+JSON Response
+Which Spring Component Uses Jackson?
+
+Spring MVC uses:
+
+MappingJackson2HttpMessageConverter
+
+Internally this converter uses:
+
+ObjectMapper
+
+from Jackson.
+
+Example Request Flow
+
+Client sends:
+
+{
+  "name": "Rahul"
+}
+
+Controller:
+
+@PostMapping("/user")
+public User save(@RequestBody User user)
+
+Jackson converts:
+
+JSON → User object
+
+before controller method executes.
+
+Serialization Example
+User user = new User(1, "Rahul");
+
+Jackson converts to:
+
+{
+  "id":1,
+  "name":"Rahul"
+}
+Deserialization Example
+
+JSON:
+
+{
+  "id":1,
+  "name":"Rahul"
+}
+
+Jackson converts to:
+
+new User(1, "Rahul")
+Important Jackson Annotations
+Annotation	Purpose
+@JsonIgnore	ignore field
+@JsonProperty	custom JSON name
+@JsonFormat	date formatting
+@JsonInclude	ignore null values
+
+    @Column
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = BaseEntity.ENTITY_DATE_FORMAT)
+    ZonedDateTime statWindowStartTime;
+    // Time when the scheduler task started
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss,SSS")
+    private LocalDateTime startedTime;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class NotificationDTO {
+ 
+    private String messageId;
+ 
+    @NotEmpty(message = "Notification details cannot be empty")
+    private List<NotificationDetails> notificationDetails;
+ 
+    @Getter
+    @Setter
+    @ToString
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class NotificationDetails {
+ 
+        @NotNull(message = "Destination cannot be null")
+        @NotEmpty(message = "Destination cannot be empty")
+        @Pattern(regexp = "^(\\+?[1-9]\\d{7,15}|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})$",
+                message = "Destination must be a valid email address or mobile number")
+        private String destination;
+ 
+        @NotNull(message = "Notification type must be provided")
+        private NotificationCategory notificationType;
+ 
+        @NotNull(message = "Provider name cannot be null")
+        @NotEmpty(message = "Provider name cannot be empty")
+        @JsonProperty("providerName")
+        private String processorName;
+
+
+Example
+public class User {
+
+    @JsonProperty("user_name")
+    private String name;
+}
+
+JSON becomes:
+
+{
+  "user_name":"Rahul"
+}
+Spring Boot Auto-Configuration for Jackson
+
+Spring Boot automatically configures:
+
+ObjectMapper
+HttpMessageConverters
+JSON support
+
+via:
+
+spring-boot-starter-web
+
+Without Boot, you manually configure this.
+
+2. Role of MVC Config in Spring Boot
+What is MVC Config?
+
+MVC configuration controls how Spring MVC behaves.
+
+MVC =
+
+Model + View + Controller
+
+MVC config defines:
+
+URL handling
+view resolvers
+static resources
+interceptors
+formatters
+CORS
+message converters
+validation
+Main Class Behind MVC Config
+
+Spring MVC internally uses:
+
+WebMvcConfigurationSupport
+
+Boot auto-configures MVC through:
+
+WebMvcAutoConfiguration
+Default MVC Features Auto-Configured by Boot
+
+Spring Boot automatically sets up:
+
+Feature	Purpose
+DispatcherServlet	front controller
+HandlerMapping	URL mapping
+HandlerAdapter	execute controller
+Jackson converters	JSON
+Static resource handling	CSS/JS/images
+Validation	@Valid
+Exception resolvers	global exceptions
+Content negotiation	JSON/XML
+Path matching	URL routing
+Example MVC Configurations
+A. CORS Configuration
+@Configuration
+public class MyConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**");
+    }
+}
+
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+
+@Configuration
+public class CustomMessageSourceConfiguration extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
+    List<Locale> LOCALES = Arrays.asList(new Locale("en"), new Locale("fr"));
+
+    @Override
+    public Locale resolveLocale(HttpServletRequest request) {
+        String headerLang = request.getHeader("Accept-Language");
+        return headerLang == null || headerLang.isEmpty() ? Locale.US : Locale.lookup(Locale.LanguageRange.parse(headerLang), LOCALES);
+    }
+
+    @Bean
+    public ResourceBundleMessageSource messageSource() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setUseCodeAsDefaultMessage(true);
+        return messageSource;
+    }
+
+    @Override
+    public Validator getValidator() {
+        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+        bean.setValidationMessageSource(messageSource());
+        return bean;
+    }
+}
+
+
+Purpose:
+
+Allow frontend apps to call backend APIs
+B. Interceptor Configuration
+@Override
+public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(new MyInterceptor());
+}
+
+Purpose:
+
+logging
+auth checking
+audit
+C. Static Resource Config
+/static
+/public
+/resources
+
+Spring Boot automatically exposes these.
+
+Example:
+
+static/logo.png
+
+Accessible as:
+
+http://localhost:8080/logo.png
+D. Formatter/Converter Config
+@Override
+public void addFormatters(FormatterRegistry registry)
+
+Used for:
+
+String → Custom Object conversion
+E. MessageConverter Customization
+
+You can customize JSON behavior.
+
+@Override
+public void configureMessageConverters(
+       List<HttpMessageConverter<?>> converters)
+Spring MVC Internal Request Flow
+Request
+   ↓
+DispatcherServlet
+   ↓
+HandlerMapping
+   ↓
+HandlerAdapter
+   ↓
+Controller
+   ↓
+HttpMessageConverter (Jackson)
+   ↓
+JSON Response
+Relationship Between Jackson and MVC Config
+
+Jackson is actually part of MVC processing.
+
+MVC config decides:
+
+Which MessageConverters to use
+
+Jackson provides:
+
+JSON conversion capability
+Example Together
+@RestController
+public class UserController {
+
+    @GetMapping("/user")
+    public User getUser() {
+        return new User();
+    }
+}
+
+MVC Flow:
+
+DispatcherServlet
+   ↓
+Controller
+   ↓
+MVC MessageConverter
+   ↓
+Jackson
+   ↓
+JSON
+Spring vs Spring Boot Difference
+Traditional Spring MVC
+
+You manually configure:
+
+<mvc:annotation-driven />
+
+and Jackson dependency.
+
+Spring Boot
+
+Boot auto-configures:
+
+Jackson
+ObjectMapper
+MVC setup
+converters
+validation
+
+You only write controllers.
+
+Interview Summary
+Jackson Role
+Java Object ↔ JSON conversion
+
+Used by:
+
+HttpMessageConverter
+MVC Config Role
+
+Controls:
+
+Routing
+Interceptors
+Static resources
+Validation
+Converters
+CORS
+View resolution
+Internal Connection
+MVC uses HttpMessageConverters
+HttpMessageConverters use Jackson
+Jackson converts JSON
+
+========================Dispatch Servlet, FilterChain, HandlerMapping, MessageHandler to identify the controller mapping , BeanCotextAware, ApplicationContextAwere uses and its role and complete flow of spring boot application? Is this remain same flow for spring and spring boot project?
+import java.util.*;
+
+class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String input = sc.nextLine();
+        Map<String, String> map = new HashMap<>();
+        map.put("zero","0");
+        map.put("one","1");
+        map.put("two","2");
+        map.put("three","3");
+        map.put("four","4");
+        map.put("five","5");
+        map.put("six","6");
+        map.put("seven","7");
+        map.put("eight","8");
+        map.put("nine","9");
+        
+        String [] words = input.split(" ");
+        StringBuilder result = new StringBuilder();
+        
+        for(int i=0; i< words.length; i++){
+            if(words[i].equals("double")) {
+                String digit = map.get(words[i+1]);
+                result.append(digit);
+                result.append(digit);
+                i++;
+            }else if(words[i].equals("triple")){
+                String digit = map.get(words[i+1]);
+                result.append(digit);
+                result.append(digit);
+                result.append(digit);
+                i++;
+            }else {
+                result.append(map.get(words[i]));
+            }
+        }
+        System.out.println(result.toString());
+    }
+}
+
+Resource acess auththenticatiln and invalid request return
+
+=============Dispatch Servlet, FilterChain, HandlerMapping, MessageHandler ===============
+Dispatch Servlet, FilterChain, HandlerMapping, MessageHandler to identify the controller mapping , BeanCotextAware, ApplicationContextAwere uses and its role and complete flow of spring boot application?
+
+Here’s a structured walkthrough of the complete request flow in a Spring Boot web application, including the roles of:
+
+DispatcherServlet
+FilterChain
+HandlerMapping
+HandlerAdapter
+MessageConverter / MessageHandler
+BeanFactoryAware
+ApplicationContextAware
+Controller mapping resolution
+Full lifecycle from request → response
+1. Spring Boot Application Startup Flow
+
+When you run:
+
+@SpringBootApplication
+public class App {
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+}
+
+Spring Boot internally does:
+Creates ApplicationContext
+Starts embedded server (Tomcat/Jetty/Undertow)
+Performs component scanning
+Creates beans
+Initializes Spring MVC infrastructure
+Registers DispatcherServlet
+
+2. Core Spring Containers
+BeanFactory
+
+Basic IoC container.
+
+Responsible for:
+
+Bean creation
+Dependency Injection
+Bean lifecycle
+ApplicationContext
+
+Advanced container built on top of BeanFactory.
+
+Adds:
+
+Events
+Internationalization
+AOP integration
+Environment support
+Resource loading
+3. Aware Interfaces
+
+These allow beans to access internal Spring infrastructure.
+
+BeanFactoryAware
+
+Used when a bean wants direct access to the BeanFactory.
+
+Example:
+
+@Component
+public class MyBean implements BeanFactoryAware {
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) {
+        System.out.println(beanFactory);
+    }
+}
+Role
+Access bean metadata
+Dynamically fetch beans
+Low-level container operations
+
+Usually used internally by Spring.
+
+ApplicationContextAware
+
+Provides access to full ApplicationContext.
+
+@Component
+public class MyBean implements ApplicationContextAware {
+
+    @Override
+    public void setApplicationContext(ApplicationContext ctx) {
+        System.out.println(ctx.getBean("myService"));
+    }
+}
+Role
+Access all Spring features
+Publish events
+Access environment
+Dynamically fetch beans
+4. HTTP Request Flow in Spring Boot
+
+Now the important part.
+
+COMPLETE FLOW
+Client Request
+      ↓
+Servlet Container (Tomcat)
+      ↓
+FilterChain
+      ↓
+DispatcherServlet
+      ↓
+HandlerMapping
+      ↓
+HandlerAdapter
+      ↓
+Controller Method
+      ↓
+Service Layer
+      ↓
+Repository Layer
+      ↓
+Response Returned
+      ↓
+MessageConverter
+      ↓
+DispatcherServlet
+      ↓
+FilterChain Response
+      ↓
+Client Response
+5. FilterChain
+
+Servlet filters execute BEFORE request reaches Spring MVC.
+
+Example filters:
+
+Authentication filter
+Logging filter
+CORS filter
+Spring Security filters
+
+Example:
+
+@Component
+public class LoggingFilter implements Filter {
+
+    public void doFilter(
+        ServletRequest req,
+        ServletResponse res,
+        FilterChain chain) {
+
+        System.out.println("Before");
+
+        chain.doFilter(req, res);
+
+        System.out.println("After");
+    }
+}
+Role of FilterChain
+Request → Filter1 → Filter2 → Filter3 → DispatcherServlet
+
+Used for:
+
+Security
+Logging
+Compression
+JWT validation
+CORS
+6. DispatcherServlet
+
+The heart of Spring MVC.
+
+Front Controller Pattern implementation.
+
+All requests come here first.
+
+Configured automatically by Spring Boot.
+
+Responsibilities
+Receives request
+Finds controller
+Executes handler
+Converts request/response
+Handles exceptions
+Returns response
+7. HandlerMapping
+
+Responsible for identifying WHICH controller method should execute.
+
+Example:
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Long id) {
+        return service.find(id);
+    }
+}
+
+Request:
+
+GET /users/10
+What HandlerMapping does
+
+It scans all controller mappings during startup:
+
+/users/{id} → UserController#getUser
+
+At runtime:
+
+DispatcherServlet
+      ↓
+HandlerMapping
+      ↓
+Returns HandlerMethod
+
+Internally returns:
+
+HandlerExecutionChain
+
+Containing:
+
+Controller method
+Interceptors
+8. HandlerAdapter
+
+DispatcherServlet cannot directly invoke all handler types.
+
+So it uses HandlerAdapter.
+
+Role
+
+Executes controller method.
+
+Flow:
+
+DispatcherServlet
+      ↓
+HandlerAdapter
+      ↓
+invoke(controllerMethod)
+9. Argument Resolution
+
+Before calling controller method:
+
+Spring resolves:
+
+@PathVariable
+@RequestParam
+@RequestBody
+HttpServletRequest
+Headers
+
+Example:
+
+@PostMapping
+public User save(@RequestBody User user)
+
+JSON body converted into Java object.
+
+This is done using:
+
+HttpMessageConverters
+10. MessageConverter / MessageHandler
+
+Very important.
+
+Converts:
+
+Request body → Java object
+Java object → JSON/XML response
+Example
+
+Incoming JSON:
+
+{
+  "name":"John"
+}
+
+Converted to:
+
+User user
+
+Using:
+
+MappingJackson2HttpMessageConverter
+Response Conversion
+
+Controller returns:
+
+return new User("John");
+
+Spring converts:
+
+User → JSON
+Message Conversion Flow
+Request JSON
+      ↓
+HttpMessageConverter
+      ↓
+Java Object
+      ↓
+Controller
+      ↓
+Java Object Response
+      ↓
+HttpMessageConverter
+      ↓
+JSON Response
+11. Interceptors
+
+Executed around controller invocation.
+
+Flow:
+
+Filter
+   ↓
+Interceptor preHandle()
+   ↓
+Controller
+   ↓
+Interceptor postHandle()
+12. Exception Handling
+
+If exception occurs:
+
+Controller
+   ↓
+ExceptionResolver
+   ↓
+@ControllerAdvice
+
+Example:
+
+@RestControllerAdvice
+public class GlobalHandler {
+
+    @ExceptionHandler(Exception.class)
+    public String handle(Exception e) {
+        return "Error";
+    }
+}
+13. Response Flow
+
+Controller returns:
+
+return ResponseEntity.ok(data);
+
+Then:
+
+HandlerAdapter
+   ↓
+MessageConverter
+   ↓
+DispatcherServlet
+   ↓
+Filters
+   ↓
+Tomcat
+   ↓
+Client
+14. Complete Detailed Internal Flow
+STEP-BY-STEP
+Step 1 — Application Starts
+SpringApplication.run()
+
+Creates:
+
+BeanFactory
+ApplicationContext
+
+Scans:
+
+@Component
+@Service
+@Repository
+@Controller
+Step 2 — Beans Created
+
+Dependency injection occurs.
+
+Aware interfaces invoked:
+
+setBeanFactory()
+setApplicationContext()
+Step 3 — DispatcherServlet Registered
+
+Embedded Tomcat maps:
+
+/ → DispatcherServlet
+Step 4 — Request Comes
+GET /users/1
+
+Tomcat receives request.
+
+Step 5 — FilterChain Executes
+SecurityFilter
+LoggingFilter
+CorsFilter
+Step 6 — DispatcherServlet Handles Request
+
+Central entry point.
+
+Step 7 — HandlerMapping Finds Controller
+
+Finds:
+
+UserController#getUser()
+Step 8 — HandlerAdapter Invokes Method
+
+Resolves:
+
+Parameters
+Request body
+Path variables
+Step 9 — Controller Executes
+service.getUser()
+Step 10 — Service Layer
+
+Business logic.
+
+Step 11 — Repository Layer
+
+DB interaction.
+
+Step 12 — Response Returned
+User object
+Step 13 — MessageConverter Converts Response
+User → JSON
+Step 14 — DispatcherServlet Sends Response
+
+Back through filters.
+
+Step 15 — Client Receives JSON
+
+Done.
+
+15. Visual Architecture Diagram
+                    SPRING BOOT REQUEST FLOW
+
+Client
+   ↓
+Tomcat Embedded Server
+   ↓
+========================
+      FILTER CHAIN
+========================
+   ↓
+DispatcherServlet
+   ↓
+HandlerMapping
+   ↓
+HandlerExecutionChain
+   ↓
+HandlerAdapter
+   ↓
+ArgumentResolvers
+   ↓
+HttpMessageConverters
+   ↓
+Controller
+   ↓
+Service
+   ↓
+Repository
+   ↓
+Database
+   ↓
+Repository
+   ↓
+Service
+   ↓
+Controller
+   ↓
+HttpMessageConverters
+   ↓
+DispatcherServlet
+   ↓
+FilterChain
+   ↓
+Client Response
+16. Important Spring MVC Components Summary
+Component	Responsibility
+DispatcherServlet	Front Controller
+FilterChain	Pre/Post request processing
+HandlerMapping	Find controller method
+HandlerAdapter	Execute controller
+ArgumentResolver	Resolve method parameters
+MessageConverter	JSON ↔ Java conversion
+Interceptor	Controller interception
+ExceptionResolver	Handle exceptions
+BeanFactory	Bean creation
+ApplicationContext	Advanced Spring container
+17. Difference Between Filter vs Interceptor
+Filter	Interceptor
+Servlet level	Spring MVC level
+Before DispatcherServlet	After DispatcherServlet
+Works for all requests	Works for controller requests
+Used for security/CORS	Used for logging/auth
+javax.servlet.Filter	HandlerInterceptor
+18. Key Interview Explanation
+
+If asked:
+
+“How does Spring Boot identify controller mapping?”
+
+Answer:
+
+DispatcherServlet receives request.
+It asks HandlerMapping to find matching controller method.
+HandlerMapping checks URL mappings registered during startup.
+Returns HandlerMethod.
+DispatcherServlet uses HandlerAdapter to invoke it.
+Request/response conversion handled by HttpMessageConverters.
+19. Most Important Internal Classes
+Feature	Internal Class
+Front Controller	DispatcherServlet
+URL Mapping	RequestMappingHandlerMapping
+Controller Executor	RequestMappingHandlerAdapter
+JSON Converter	MappingJackson2HttpMessageConverter
+Bean Container	DefaultListableBeanFactory
+App Context	AnnotationConfigApplicationContext
+Embedded Server	TomcatServletWebServerFactory
+20. Very Short End-to-End Summary
+Client request
+→ Filters
+→ DispatcherServlet
+→ HandlerMapping finds controller
+→ HandlerAdapter invokes method
+→ MessageConverter converts data
+→ Response returned
+→ Filters
+→ Client
+
+
+
+
+
+================== Dispatch Servlet, FilterChain, HandlerMapping, MessageHandler ==========================
+
+application security kaise manage karte hain. use hindi shabd.
+
+Application Security (एप्लिकेशन सुरक्षा) का मतलब है किसी सॉफ़्टवेयर, वेबसाइट या मोबाइल ऐप को हैकिंग, डेटा चोरी और गलत उपयोग से सुरक्षित रखना। इसे कई चरणों में संभाला जाता है।
+
+Application Security कैसे प्रबंधित करते हैं
+1. आवश्यकताओं की पहचान (Requirement Analysis)
+
+सबसे पहले यह समझते हैं:
+
+कौन-सा डेटा संवेदनशील है
+किस प्रकार का खतरा हो सकता है
+कौन-कौन उपयोगकर्ता सिस्टम इस्तेमाल करेंगे
+
+उदाहरण:
+
+बैंकिंग ऐप में ग्राहक का पैसा और निजी जानकारी सुरक्षित रखना सबसे महत्वपूर्ण होता है।
+2. सुरक्षित डिज़ाइन बनाना (Secure Design)
+
+सिस्टम बनाते समय ही सुरक्षा जोड़ी जाती है।
+
+मुख्य बातें:
+
+कम से कम अधिकार देना (Least Privilege)
+उपयोगकर्ता की पहचान सत्यापित करना
+डेटा एन्क्रिप्शन (कूटलेखन)
+3. सुरक्षित कोड लिखना (Secure Coding)
+
+डेवलपर ऐसा कोड लिखते हैं जिससे सामान्य हमले न हो सकें।
+
+बचाव किया जाता है:
+
+SQL Injection
+Cross-Site Scripting (XSS)
+CSRF
+कमजोर पासवर्ड
+
+उपयोग:
+
+इनपुट सत्यापन
+सुरक्षित लाइब्रेरी
+कोड समीक्षा
+4. परीक्षण और जाँच (Security Testing)
+
+एप्लिकेशन की कमजोरियाँ खोजी जाती हैं।
+
+प्रमुख परीक्षण:
+
+Vulnerability Scan (कमजोरी स्कैन)
+Penetration Testing (घुसपैठ परीक्षण)
+Source Code Review (स्रोत कोड समीक्षा)
+5. पहचान और प्रवेश नियंत्रण (Authentication & Authorization)
+
+यह सुनिश्चित किया जाता है कि:
+
+सही व्यक्ति ही लॉगिन करे
+वही चीज़ें देख सके जिनकी अनुमति है
+
+तकनीक:
+
+Multi-Factor Authentication (बहु-स्तरीय सत्यापन)
+Role-Based Access Control
+6. डेटा सुरक्षा (Data Protection)
+
+डेटा को सुरक्षित रखने के लिए:
+
+HTTPS उपयोग
+Database Encryption
+Backup और Recovery व्यवस्था
+7. निगरानी और लॉगिंग (Monitoring & Logging)
+
+सिस्टम की गतिविधियों पर लगातार नज़र रखी जाती है।
+
+उदाहरण:
+
+असामान्य लॉगिन
+बार-बार गलत पासवर्ड
+संदिग्ध ट्रैफिक
+8. नियमित अद्यतन (Patch Management)
+
+पुराने सॉफ़्टवेयर में कमजोरियाँ होती हैं, इसलिए:
+
+नियमित अपडेट
+सुरक्षा पैच
+निर्भर लाइब्रेरी अपडेट
+9. घटना प्रतिक्रिया (Incident Response)
+
+यदि हमला हो जाए तो:
+
+तुरंत पहचान
+नुकसान सीमित करना
+कारण पता करना
+सिस्टम पुनः सुरक्षित करना
+आम सुरक्षा उपकरण
+
+कुछ लोकप्रिय सुरक्षा उपकरण:
+
+Burp Suite
+OWASP ZAP
+SonarQube
+Nessus
+महत्वपूर्ण सुरक्षा सिद्धांत
+“Security by Design” → शुरुआत से सुरक्षा
+“Zero Trust” → किसी पर स्वतः भरोसा नहीं
+“Defense in Depth” → कई स्तर की सुरक्षा
+सरल उदाहरण
+
+मान लीजिए एक ई-कॉमर्स वेबसाइट है:
+
+उपयोगकर्ता OTP से लॉगिन करता है
+भुगतान डेटा एन्क्रिप्ट होता है
+एडमिन और ग्राहक की अलग अनुमति होती है
+हर गतिविधि का लॉग रखा जाता है
+
+यही Application Security Management है।
+
+ek web application jo angular UI aur java spring boot backend ka upe karke banaya gaya hai. uski security kaise karte hain.  jaise api gateway par ya load balancer ngnix or similar tech and docker image pods etc.
+
+Angular UI + Java Spring Boot आधारित Web Application की सुरक्षा कई स्तरों पर की जाती है। इसे सामान्यतः Layered Security (बहु-स्तरीय सुरक्षा) कहते हैं।
+
+नीचे एक वास्तविक Production Architecture के हिसाब से समझाया गया है।
+
+Web Application Security Architecture
+User
+  ↓
+WAF / CDN
+  ↓
+Load Balancer (Nginx/HAProxy)
+  ↓
+API Gateway
+  ↓
+Authentication Service
+  ↓
+Spring Boot Microservices
+  ↓
+Database / Cache / Queue
+  ↓
+Docker / Kubernetes Infrastructure
+1. Frontend (Angular UI) Security
+
+Angular केवल UI है, इसलिए इसकी सुरक्षा मुख्यतः Browser और API communication पर होती है।
+
+क्या करते हैं
+HTTPS अनिवार्य
+पूरा Angular app HTTPS पर चलना चाहिए।
+HTTP को redirect करें।
+Token आधारित Login
+
+सामान्यतः:
+
+JWT Token
+OAuth2
+OpenID Connect
+
+उपयोग करते हैं।
+
+XSS Protection
+
+Angular काफी हद तक XSS से बचाता है, लेकिन फिर भी:
+
+innerHTML का कम उपयोग
+User input sanitize
+CSP Header लगाना
+Sensitive Data Browser में Store न करें
+
+मत रखें:
+
+Password
+Secret key
+DB URL
+
+LocalStorage में JWT रखने की जगह:
+
+HttpOnly Secure Cookies बेहतर हैं।
+CORS Configuration
+
+Backend केवल trusted domain को allow करे।
+
+उदाहरण:
+
+allowedOrigins("https://myapp.com")
+2. Nginx / Load Balancer Security
+Nginx क्या करता है
+SSL Termination
+Reverse Proxy
+Rate Limiting
+Request Filtering
+Nginx पर सुरक्षा
+TLS/SSL
+
+कमज़ोर cipher disable करें।
+
+Rate Limiting
+
+Brute force रोकने के लिए:
+
+limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+Security Headers
+
+जैसे:
+
+X-Frame-Options
+X-XSS-Protection
+Content-Security-Policy
+Strict-Transport-Security
+Request Size Limit
+
+बहुत बड़ी request रोकें।
+
+client_max_body_size 10M;
+DDoS Protection
+Cloudflare
+AWS Shield
+Fail2Ban
+3. API Gateway Security
+
+API Gateway पूरी system का सुरक्षा द्वार होता है।
+
+लोकप्रिय:
+
+Spring Cloud Gateway
+Kong
+Apigee
+AWS API Gateway
+Gateway पर क्या सुरक्षा लगती है
+Authentication
+
+Gateway JWT verify करता है।
+
+Authorization
+
+कौन कौन API access कर सकता है।
+
+Rate Limiting
+
+प्रति user/API limit।
+
+IP Whitelisting
+
+Internal API केवल internal network से।
+
+Request Validation
+
+गलत JSON/blocking।
+
+API Versioning
+
+पुराने insecure APIs हटाना आसान।
+
+4. Spring Boot Backend Security
+
+सबसे महत्वपूर्ण हिस्सा।
+
+Spring Security उपयोग
+
+आमतौर पर:
+
+JWT Authentication
+OAuth2
+RBAC (Role Based Access Control)
+Endpoint Protection
+@PreAuthorize("hasRole('ADMIN')")
+Password Security
+
+Password कभी plain text में नहीं।
+
+उपयोग:
+
+BCrypt
+Argon2
+SQL Injection Protection
+
+JPA/Hibernate या Prepared Statement उपयोग करें।
+
+गलत:
+
+"SELECT * FROM users WHERE name='" + input + "'"
+Input Validation
+@NotNull
+@Size
+@Email
+Secrets Management
+
+मत रखें:
+
+Passwords in Git
+API keys in code
+
+उपयोग:
+
+Vault
+Kubernetes Secrets
+AWS Secrets Manager
+Logging Security
+
+मत log करें:
+
+Password
+Card data
+JWT
+5. Docker Security
+
+Container सुरक्षा बहुत जरूरी है।
+
+Minimal Base Image
+
+उदाहरण:
+
+Alpine Linux
+Distroless Images
+Root User Avoid करें
+
+गलत:
+
+USER root
+Image Scanning
+
+उपयोग:
+
+Trivy
+Clair
+Snyk
+Immutable Images
+
+Runtime में container modify न हो।
+
+Signed Images
+
+Trusted registry से images लें।
+
+6. Kubernetes / Pods Security
+
+यदि K8s उपयोग कर रहे हैं।
+
+Namespace Isolation
+
+हर service अलग namespace।
+
+Network Policies
+
+कौन pod किससे बात करेगा।
+
+Pod Security
+
+मत allow करें:
+
+Privileged containers
+Host network access
+Resource Limits
+limits:
+  memory: "512Mi"
+  cpu: "1"
+Secrets Protection
+
+Secrets को:
+
+encrypted etcd
+external vault
+
+में रखें।
+
+RBAC
+
+Developer को cluster-admin न दें।
+
+7. Database Security
+Private Network Only
+
+DB public internet पर expose न करें।
+
+Encryption
+At Rest
+In Transit
+Least Privilege
+
+App user को केवल जरूरी permissions।
+
+Backup & Recovery
+
+Regular encrypted backups।
+
+8. Monitoring & Threat Detection
+Monitoring Tools
+Prometheus
+Grafana
+Centralized Logging
+ELK Stack
+Loki
+Security Monitoring
+SIEM
+Falco
+Wazuh
+9. DevSecOps (बहुत महत्वपूर्ण)
+
+Security केवल deployment के बाद नहीं।
+
+CI/CD pipeline में security जोड़ते हैं।
+
+Pipeline में Checks
+SAST
+
+Static Code Scan
+
+उदाहरण:
+
+SonarQube
+Checkmarx
+DAST
+
+Running app scan
+
+उदाहरण:
+
+OWASP ZAP
+Dependency Scan
+
+पुरानी vulnerable libraries detect।
+
+10. Real Production Best Practices
+सामान्य Production Setup
+Cloudflare
+   ↓
+Nginx Load Balancer
+   ↓
+API Gateway
+   ↓
+Kubernetes Cluster
+   ↓
+Spring Boot Pods
+   ↓
+PostgreSQL/Redis
+सबसे जरूरी Security Controls
+Layer	Main Security
+Angular	XSS, CSP, HTTPS
+Nginx	SSL, Rate Limit
+API Gateway	JWT, API Control
+Spring Boot	Auth, Validation
+Docker	Non-root, Scan
+Kubernetes	RBAC, NetworkPolicy
+Database	Encryption
+CI/CD	Security Scan
+Enterprise Level Extra Security
+
+बड़ी कंपनियाँ और भी जोड़ती हैं:
+
+Service Mesh (Istio)
+mTLS
+Zero Trust Network
+Runtime Threat Detection
+WAF
+Bot Protection
+API Threat Detection
+
+यदि चाहो तो मैं अगली बार:
+
+पूरा Secure Architecture Diagram
+Spring Security JWT implementation
+Nginx secure config
+Kubernetes security YAML
+DevSecOps pipeline example
+Production deployment checklist
+
+भी हिंदी में दे सकता हूँ।
+
+Dockerfile kaise create karte hai aur usme kya kya information use hoti hai. Ek spring boot service mein dockerfile mein kya content hote hai ya ho sakte hai.
+Dockerfile क्या होता है
+
+Dockerfile एक टेक्स्ट फ़ाइल होती है जिसमें लिखा जाता है कि Docker Image कैसे बनानी है।
+
+यह बताता है:
+
+कौन-सा Base OS या Runtime उपयोग होगा
+Application files कहाँ copy होंगी
+कौन-से commands चलेंगे
+Application कैसे start होगी
+Spring Boot Service के लिए Dockerfile क्यों उपयोग करते हैं
+
+ताकि:
+
+Application हर environment में समान चले
+Deployment आसान हो
+Kubernetes/Docker में run हो सके
+Dependencies isolate रहें
+Dockerfile में सामान्यतः क्या-क्या होता है
+निर्देश	काम
+FROM	Base image चुनता है
+WORKDIR	Working directory सेट
+COPY	Files copy
+ADD	Files/URL add
+RUN	Build commands चलाना
+EXPOSE	Port declare
+ENV	Environment variables
+ENTRYPOINT	Container start command
+CMD	Default arguments
+USER	किस user से run होगा
+Basic Spring Boot Dockerfile Example
+
+मान लो:
+
+Spring Boot app का jar नाम app.jar
+App port 8080
+Simple Dockerfile
+FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+COPY target/app.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+अब हर लाइन समझते हैं
+1. FROM
+FROM eclipse-temurin:17-jdk-alpine
+
+इसका मतलब:
+
+Java 17 runtime उपयोग करो
+Alpine lightweight Linux है
+2. WORKDIR
+WORKDIR /app
+
+Container के अंदर /app directory current working folder बन जाती है।
+
+3. COPY
+COPY target/app.jar app.jar
+
+Local machine से jar file container में copy होती है।
+
+4. EXPOSE
+EXPOSE 8080
+
+बताता है app किस port पर चलेगी।
+
+5. ENTRYPOINT
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+Container start होते ही यह command चलेगी।
+
+Docker Image कैसे बनाते हैं
+docker build -t user-service:v1 .
+Container कैसे चलाते हैं
+docker run -p 8080:8080 user-service:v1
+Production Grade Spring Boot Dockerfile
+
+असल projects में अधिक secure और optimized Dockerfile उपयोग होती है।
+
+Better Dockerfile
+FROM eclipse-temurin:17-jre-alpine
+
+RUN addgroup -S spring && adduser -S spring -G spring
+
+USER spring:spring
+
+WORKDIR /app
+
+COPY target/user-service.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-jar", "app.jar"]
+इसमें Extra क्या है
+JRE instead of JDK
+FROM eclipse-temurin:17-jre-alpine
+
+Production में compile नहीं करना होता।
+
+इसलिए:
+
+छोटी image
+कम vulnerabilities
+Non-root User
+USER spring:spring
+
+Security के लिए बहुत जरूरी।
+
+यदि container hack हो जाए तो attacker root access नहीं पाएगा।
+
+Multi-Stage Build Dockerfile
+
+Production में बहुत popular।
+
+फायदा
+Final image छोटी
+Build tools final image में नहीं जाते
+Security बेहतर
+Example
+FROM maven:3.9-eclipse-temurin-17 AS build
+
+WORKDIR /build
+
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+
+COPY --from=build /build/target/user-service.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+यह कैसे काम करता है
+Stage 1
+
+Maven image में build करता है।
+
+Stage 2
+
+केवल final jar lightweight image में copy होती है।
+
+Dockerfile में Environment Variables
+ENV SPRING_PROFILES_ACTIVE=prod
+
+या runtime में:
+
+docker run -e SPRING_PROFILES_ACTIVE=prod
+Health Check भी जोड़ सकते हैं
+HEALTHCHECK CMD wget --spider http://localhost:8080/actuator/health || exit 1
+
+Kubernetes/Docker monitoring में मदद करता है।
+
+Spring Boot Docker Best Practices
+1. Small Image Use करें
+Alpine
+Distroless
+2. Root User Avoid करें
+3. Secrets Image में Hardcode न करें
+
+गलत:
+
+ENV DB_PASSWORD=admin123
+4. Layer Optimization
+
+पहले dependencies copy करें ताकि cache reuse हो सके।
+
+5. .dockerignore उपयोग करें
+
+उदाहरण:
+
+target/
+.git/
+.idea/
+Kubernetes में यही Image कैसे उपयोग होती है
+containers:
+  - name: user-service
+    image: company/user-service:v1
+Enterprise Setup में Docker Flow
+Developer
+   ↓
+Git Push
+   ↓
+CI/CD Pipeline
+   ↓
+Docker Image Build
+   ↓
+Security Scan
+   ↓
+Docker Registry
+   ↓
+Kubernetes Deployment
+Docker Registry क्या होता है
+
+जहाँ images store होती हैं।
+
+उदाहरण:
+
+Docker Hub
+Amazon Web Services ECR
+Google Artifact Registry
+GitHub Container Registry
+एक Real Enterprise Spring Boot Dockerfile में यह सब हो सकता है
+Base Image
+Java Runtime
+Non-root User
+Health Check
+JVM Memory Config
+Environment Variables
+Logging Config
+Monitoring Agent
+Security Hardening
+Multi-stage Build
+निष्कर्ष
+
+Spring Boot Dockerfile का मुख्य उद्देश्य:
+
+Application को package करना
+Portable बनाना
+Secure deployment देना
+Kubernetes/Cloud compatible बनाना
+
+और Production में:
+
+Multi-stage build
+Non-root user
+Lightweight image
+Security scanning
+
+बहुत महत्वपूर्ण माने जाते
+============== forward-proxy reverse-proxy =============
+
+Forward Proxy- Access internet on your behalf and protect your real IP.
+your device --- forward proxy --- Internet
+a. helps accessing restricted content
+b. inhanceing your privecy haiding your real IP address.
+c. forward proxy hide client, reverse proxy hides server.
+d. amazon.com <--  reverse proxy (API Gateway, load balanceing, filters request, ) --> pay.amazon.com, order.amazon.com, cart.amazon.com
+============== forward-proxy reverse-proxy =============
+Spring WebFlux/ Mono???
+How to manage application security?
+How to manage spring application security?
+Why we use @RequiredArgsConstructor Over @Autowired
+Token types
+===========WebClient===============
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import reactor.netty.http.client.HttpClient;
+
+@Configuration
+public class WebClientConfig {
+
+    /*
+     *  Define the ReactorClientHttpConnector bean explicitly
+     */
+    @Bean
+    public ReactorClientHttpConnector reactorClientHttpConnector() {
+        HttpClient httpClient = HttpClient.create();
+        return new ReactorClientHttpConnector(httpClient);
+    }
+
+    /*
+     *  Define the WebClient bean that uses the ReactorClientHttpConnector
+     */
+    @Bean
+    public WebClient webClient(ReactorClientHttpConnector reactorClientHttpConnector) {
+        return WebClient.builder()
+                .clientConnector(reactorClientHttpConnector)
+                .build();
+    }
+}
+
+
+
+@Bean
+public RestTemplate restTemplate() {
+    RestTemplate template = new RestTemplate();
+
+    template.setRequestFactory(
+        new HttpComponentsClientHttpRequestFactory()
+    );
+
+    return template;
+}
+
+===========@Bean and @Component============
+Difference between @Bean and @Component? When to use which?
+
+In the context of Spring Framework and Spring Boot, both @Component and @Bean register objects in the Spring IoC container, but they are used in different scenarios.
+
+@Component
+
+@Component is used directly on a class.
+
+Spring automatically detects it during component scanning and creates the bean for you.
+
+@Component
+public class EmailService {
+    public void send() {
+        System.out.println("Sending email");
+    }
+}
+Typical use cases
+
+Use @Component (or specialized stereotypes like @Service, @Repository, @Controller) when:
+
+You own the source code of the class
+The class represents application/business logic
+You want automatic scanning and registration
+The bean creation is straightforward
+Related stereotypes
+
+These are specialized versions of @Component:
+
+@Service
+@Repository
+@Controller
+@RestController
+
+They behave like @Component but add semantic meaning.
+
+@Bean
+
+@Bean is used on a method inside a @Configuration class.
+
+The method explicitly creates and returns the object.
+
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public EmailService emailService() {
+        return new EmailService();
+    }
+}
+Typical use cases
+
+Use @Bean when:
+
+You need manual control over object creation
+The object requires complex setup
+You need constructor arguments/configuration
+You are integrating third-party libraries
+You cannot modify the class source
+
+Example with third-party class:
+
+@Configuration
+public class Config {
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
+        return mapper;
+    }
+}
+
+You cannot annotate ObjectMapper with @Component because it belongs to another library.
+
+Core Difference
+Aspect	@Component	@Bean
+Applied on	Class	Method
+Bean creation	Automatic by Spring	Manual by developer
+Requires component scanning	Yes	No
+Best for	Your own application classes	External/library/complex objects
+Flexibility	Less	More
+Configuration style	Declarative	Programmatic
+Internal Flow
+
+With @Component:
+
+@Component
+class A {}
+
+Spring:
+
+Scans package
+Finds A
+Instantiates automatically
+
+With @Bean:
+
+@Configuration
+class Config {
+    @Bean
+    A a() {
+        return new A();
+    }
+}
+
+Spring:
+
+Creates Config
+Calls method a()
+Registers returned object
+Real-world guideline
+Prefer @Component for:
+Services
+Repositories
+Controllers
+Most application classes
+Prefer @Bean for:
+Third-party classes
+Custom initialization logic
+Multiple bean variants
+Conditional/config-driven creation
+Common interview answer
+
+A concise way to explain it:
+
+@Component lets Spring automatically create beans through classpath scanning, while @Bean gives the developer explicit control over bean creation through configuration methods.
+
+Example using both together
+@Component
+public class UserService {
+}
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+}
+
+Here:
+
+UserService is app logic → @Component
+ObjectMapper is third-party + configurable → @Bean
+Rule of thumb
+If Spring can safely auto-create it → use @Component
+If creation logic matters → use @Bean
+As we create @Bean of RestTemplate in Main Application class annotated with @SpringBootApplication right?
+
+Yes — that’s a very common pattern in Spring Boot applications.
+
+Example:
+
+@SpringBootApplication
+public class MyApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MyApplication.class, args);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+Then you can inject it anywhere:
+
+@Service
+public class UserService {
+
+    @Autowired
+    private RestTemplate restTemplate;
+}
+Why @Bean here instead of @Component?
+
+Because RestTemplate is a class from VMware Spring libraries — you usually don’t modify its source code to add @Component.
+
+Also, you often want custom configuration:
+
+@Bean
+public RestTemplate restTemplate() {
+    RestTemplate template = new RestTemplate();
+
+    template.setRequestFactory(
+        new HttpComponentsClientHttpRequestFactory()
+    );
+
+    return template;
+}
+
+So @Bean is the correct choice.
+
+Why it works inside @SpringBootApplication
+
+@SpringBootApplication internally includes:
+
+@Configuration
+@ComponentScan
+@EnableAutoConfiguration
+
+Since it already acts as a @Configuration class, Spring allows @Bean methods inside it.
+
+So this is valid:
+
+@SpringBootApplication
+public class App {
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+Better practice in larger projects
+
+For small apps, putting beans in the main class is fine.
+
+For larger applications, people usually separate configuration:
+
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+This keeps the main application class clean.
+
+Modern note
+
+In newer Spring applications, many developers prefer WebClient over RestTemplate.
+
+RestTemplate is in maintenance mode.
+
+Example:
+
+@Bean
+public WebClient webClient() {
+    return WebClient.builder().build();
+}
+
+from Spring WebFlux.
+===========@Bean and @Component============
+
+============kafka user_details-topics par publish kaise karein===============
+kafka mein database se user table (user_id, name, details) to kafka user_details-topics par publish kaise karein.  
+
+अगर इंटरव्यू में पूछा जाए कि:
+
+“Database की user table का data Kafka topic पर कैसे publish करते हैं?”
+
+तो आप इसे आसान हिन्दी में इस तरह समझा सकते हो।
+
+Scenario
+
+मान लो Database में एक table है:
+
+user
+---------
+user_id
+name
+details
+
+अब हमें इस data को Kafka के topic:
+
+user_details-topic
+
+पर भेजना है।
+
+पूरा Flow
+Database → Spring Boot Producer → Kafka Topic
+Step 1: Kafka Dependency जोड़ना
+
+pom.xml में dependency जोड़ते हैं:
+
+<dependency>
+    <groupId>org.springframework.kafka</groupId>
+    <artifactId>spring-kafka</artifactId>
+</dependency>
+Step 2: Kafka Configuration
+
+application.properties
+
+spring.kafka.bootstrap-servers=localhost:9092
+
+यह Kafka server का address है।
+
+Step 3: User Entity बनाना
+@Entity
+public class User {
+
+    @Id
+    private Long userId;
+
+    private String name;
+
+    private String details;
+}
+Step 4: Repository बनाना
+public interface UserRepository 
+       extends JpaRepository<User, Long> {
+}
+Step 5: Kafka Producer Service बनाना
+@Service
+public class KafkaProducerService {
+
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    public void publishUser(User user) {
+
+        kafkaTemplate.send(
+            "user_details-topic",
+            user
+        );
+    }
+}
+Step 6: Database से Data लेकर Kafka में Publish करना
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private KafkaProducerService producerService;
+
+    public void sendUserToKafka(Long id) {
+
+        User user = userRepository.findById(id)
+                                  .orElseThrow();
+
+        producerService.publishUser(user);
+    }
+}
+क्या हो रहा है?
+Database से User data निकला
+Spring Boot ने object बनाया
+Kafka Producer ने उस data को
+user_details-topic
+में भेज दिया
+Kafka में Data कैसे जाता है?
+
+Kafka message को:
+
+JSON / String / Byte format
+
+में भेजता है।
+
+उदाहरण JSON:
+
+{
+  "userId": 1,
+  "name": "Rahul",
+  "details": "Software Engineer"
+}
+Real Project में आमतौर पर क्या उपयोग होता है?
+
+ज़्यादातर projects में:
+
+KafkaTemplate
+JSON Serializer
+Event Driven Architecture
+
+उपयोग होता है।
+
+Interview में Short Answer
+
+"Spring Boot में पहले database से user data fetch करते हैं।
+फिर Kafka Producer और KafkaTemplate की मदद से उस data को Kafka topic पर publish करते हैं।"
+
+अगर interviewer पूछे “Real-time कैसे करेंगे?”
+
+उत्तर:
+
+"जब भी user table में नया record insert/update हो, तब event trigger करके Kafka topic पर message publish कर सकते हैं।"
+
+Advanced Real-Time Approaches
+1. Application Level Publishing
+
+जब API call होती है:
+
+Save User → Publish Kafka Event
+
+सबसे common तरीका।
+
+2. Debezium + CDC (Change Data Capture)
+
+यह production systems में बहुत उपयोग होता है।
+
+Flow:
+
+MySQL Binlog → Debezium → Kafka Topic
+
+Database change होते ही automatically Kafka में event चला जाता है।
+
+एक लाइन में याद रखने वाला उत्तर
+
+"Database से data fetch करके KafkaTemplate की मदद से Kafka topic पर publish किया जाता है।"
+
+=================kafka user_details-topics par publish kaise karein===================
+
+==========token kitne type================
+java spring boot mein token kitne type ke hote hai? 
+
+Spring Boot में “Token” का उपयोग ज़्यादातर Authentication और Security के लिए किया जाता है।
+Interview में आमतौर पर JWT Token के बारे में पूछा जाता है, लेकिन broadly tokens कई प्रकार के होते हैं।
+
+Spring Boot / Java में मुख्य Token Types
+1. JWT Token (JSON Web Token)
+
+यह सबसे ज़्यादा उपयोग होने वाला Token है।
+
+इसका उपयोग:
+
+Login Authentication
+API Security
+Stateless Authentication
+
+के लिए होता है।
+
+इसमें 3 भाग होते हैं:
+
+Header.Payload.Signature
+
+उदाहरण:
+
+eyJhbGciOiJIUzI1Ni...
+काम कैसे करता है?
+User login करता है
+Server token बनाता है
+Client token store करता है
+हर request में token भेजता है
+Server token verify करता है
+2. Access Token
+
+यह API access करने के लिए उपयोग होता है।
+
+Short time के लिए valid रहता है
+जल्दी expire हो जाता है
+Security बढ़ाता है
+
+उदाहरण:
+
+15 minutes / 1 hour validity
+3. Refresh Token
+
+जब Access Token expire हो जाता है, तब नया Access Token बनाने के लिए Refresh Token उपयोग होता है।
+
+Long expiry होती है
+Login बार-बार नहीं करना पड़ता
+4. Bearer Token
+
+जब हम request header में token भेजते हैं:
+
+Authorization: Bearer <token>
+
+तो उसे Bearer Token कहते हैं।
+
+आमतौर पर JWT ही Bearer Token के रूप में भेजा जाता है।
+
+5. OAuth Token
+
+जब हम:
+
+Google Login
+Facebook Login
+GitHub Login
+
+जैसी third-party authentication उपयोग करते हैं, तब OAuth Tokens उपयोग होते हैं।
+
+6. Session Token
+
+पुराने तरीके की authentication में उपयोग होता है।
+
+Server session store करता है
+User की information session में रहती है
+
+Spring Boot में JWT आने के बाद इसका उपयोग कम हुआ है।
+
+Interview में बोलने लायक आसान उत्तर
+
+"Spring Boot में मुख्य रूप से JWT Token, Access Token, Refresh Token, Bearer Token, OAuth Token और Session Token उपयोग होते हैं।
+इनमें सबसे ज़्यादा JWT आधारित Authentication उपयोग की जाती है।"
+
+अगर interviewer पूछे “सबसे ज़्यादा कौन सा उपयोग होता है?”
+
+उत्तर:
+
+"आजकल Microservices और REST APIs में JWT Token सबसे ज़्यादा उपयोग होता है क्योंकि यह Stateless और Secure होता है।"
+=================token kitne type=============
+==========SpringBootApplication===========
+What is the use of @SpringBootApplication how it works, what all annotation it includes?
+
+@SpringBootApplication is the main convenience annotation in Spring Boot applications.
+It marks the main class of a Spring Boot app and combines multiple important Spring annotations into one.
+
+Example:
+
+@SpringBootApplication
+public class MyApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MyApplication.class, args);
+    }
+}
+What is the use of @SpringBootApplication?
+
+It is used to:
+
+Mark the class as the starting point of a Spring Boot application
+Enable auto-configuration
+Enable component scanning
+Allow defining Spring beans
+Simplify Spring configuration
+
+Without it, you would need to manually add several annotations separately.
+
+What annotations does it include?
+
+@SpringBootApplication is actually a combination of 3 annotations:
+
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan
+
+Let’s understand each one.
+
+1. @SpringBootConfiguration
+
+This is a specialized version of @Configuration.
+
+It tells Spring:
+
+“This class contains bean definitions and configuration.”
+
+Equivalent to:
+
+@Configuration
+
+Example:
+
+@Bean
+public MyService myService() {
+    return new MyService();
+}
+
+Spring creates and manages this bean in the IoC container.
+
+2. @EnableAutoConfiguration
+
+This is the most powerful feature of Spring Boot.
+
+It tells Spring Boot:
+
+“Automatically configure the application based on dependencies present in the classpath.”
+
+Example:
+
+If you add:
+
+spring-boot-starter-web
+
+Spring Boot automatically configures:
+
+Tomcat server
+DispatcherServlet
+Jackson JSON support
+Spring MVC setup
+
+No XML configuration needed.
+
+Another example:
+
+If Spring Boot detects:
+
+spring-boot-starter-data-jpa
+
+it auto-configures:
+
+DataSource
+Hibernate
+EntityManager
+Transaction manager
+How Auto Configuration Works Internally
+
+Spring Boot checks:
+
+Dependencies in classpath
+Existing beans
+Application properties
+
+Then it loads matching configuration classes.
+
+Internally it uses:
+
+@Conditional
+
+annotations like:
+
+@ConditionalOnClass
+@ConditionalOnMissingBean
+@ConditionalOnProperty
+
+Example:
+
+@ConditionalOnClass(DataSource.class)
+
+This configuration activates only if DataSource exists.
+
+3. @ComponentScan
+
+This tells Spring:
+
+“Scan packages and register Spring components automatically.”
+
+Spring scans for:
+
+@Component
+@Service
+@Repository
+@Controller
+@RestController
+
+Example:
+
+@Service
+public class UserService {
+}
+
+Spring automatically creates the bean.
+
+How package scanning works
+
+Suppose:
+
+package com.example.app;
+
+and your main class is:
+
+package com.example.app;
+
+@SpringBootApplication
+public class MyApplication {
+}
+
+Spring scans:
+
+com.example.app
+com.example.app.*
+
+So all subpackages are scanned automatically.
+
+Internal Structure of @SpringBootApplication
+
+Simplified version:
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan
+public @interface SpringBootApplication {
+}
+What happens when application starts?
+
+When this runs:
+
+SpringApplication.run(MyApplication.class, args);
+
+Spring Boot:
+
+Creates Spring Application Context
+Starts embedded server (Tomcat/Jetty)
+Performs component scan
+Creates beans
+Applies auto-configuration
+Loads properties
+Starts the application
+Example Flow
+
+Suppose you add:
+
+spring-boot-starter-web
+
+and create:
+
+@RestController
+public class HelloController {
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello";
+    }
+}
+
+What happens:
+
+@ComponentScan finds controller
+@EnableAutoConfiguration configures Spring MVC + Tomcat
+@SpringBootConfiguration allows bean definitions
+Embedded Tomcat starts
+Endpoint becomes available
+Can we replace @SpringBootApplication manually?
+
+Yes.
+
+Instead of:
+
+@SpringBootApplication
+
+you can write:
+
+@Configuration
+@EnableAutoConfiguration
+@ComponentScan
+
+Behavior is almost the same.
+
+Common Interview Questions
+Q1: Why is @SpringBootApplication placed in root package?
+
+Because @ComponentScan scans current package and subpackages.
+
+Best practice:
+
+com.example.app
+
+Place main class at top/root package.
+
+Q2: Can we exclude auto-configuration?
+
+Yes.
+
+Example:
+
+@SpringBootApplication(
+    exclude = DataSourceAutoConfiguration.class
+)
+
+Useful when you don’t want DB configuration.
+
+Q3: Difference between @Configuration and @SpringBootConfiguration?
+
+@SpringBootConfiguration is basically:
+
+@Configuration
+
+with Spring Boot-specific semantics.
+
+Short Summary
+
+@SpringBootApplication:
+
+Combines:
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan
+Enables auto setup
+Starts component scanning
+Registers beans
+Simplifies configuration
+Used as the main entry point of Spring Boot applications
+
+Official docs:
+
+Spring Boot Documentation
+Spring Boot Reference Guide
+
+Interview mein aap simple aur confident tarike se aise bata sakte ho:
+
+@SpringBootApplication Spring Boot application ka main annotation hota hai.
+Ye batata hai ki yahi application ka starting point hai.
+
+Ye 3 important annotations ko combine karta hai:
+
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan
+1. @SpringBootConfiguration
+
+Ye Spring ko batata hai ki:
+
+“Ye class configuration class hai aur yahan beans define ho sakte hain.”
+
+Simple language mein:
+Spring ko application ki settings aur beans ki information milti hai.
+
+2. @EnableAutoConfiguration
+
+Ye Spring Boot ka sabse important feature hai.
+
+Ye automatically configuration kar deta hai based on dependencies.
+
+Example:
+
+Agar hum:
+
+spring-boot-starter-web
+
+dependency add karte hain, to Spring Boot automatically:
+
+Tomcat configure karta hai
+Spring MVC setup karta hai
+JSON support deta hai
+
+Hume manually configuration nahi karni padti.
+
+3. @ComponentScan
+
+Ye current package aur uske sub-packages scan karta hai.
+
+Aur automatically classes ko Spring bean bana deta hai jinke upar annotations ho:
+
+@Controller
+@Service
+@Repository
+@Component
+
+Example:
+
+@Service
+public class UserService {
+}
+
+Spring automatically iska object create kar deta hai.
+
+Simple Flow Interview Answer
+
+Aap short mein aise bol sakte ho:
+
+"@SpringBootApplication Spring Boot application ka main annotation hai.
+Ye 3 annotations ka combination hai:
+@SpringBootConfiguration,
+@EnableAutoConfiguration,
+aur @ComponentScan.
+
+Ye automatic configuration karta hai, components scan karta hai, aur application ko start karne mein help karta hai."
+
+Agar interviewer pooche “How it works?”
+
+Simple answer:
+
+"Jab application start hoti hai aur SpringApplication.run() execute hota hai, tab Spring Boot:
+
+component scan karta hai,
+beans create karta hai,
+required configurations automatically load karta hai,
+aur embedded Tomcat server start karta hai."
+Ek line mein yaad rakhne wala answer
+
+"@SpringBootApplication Spring Boot app ka entry point hota hai jo auto-configuration, component scanning aur configuration setup provide karta hai."
+
+hindi shabd ka use karo,
+
+Interview mein aap ise pure saral Hindi shabdon mein is tarah bata sakte ho:
+
+@SpringBootApplication Spring Boot application ka mukhya annotation hota hai।
+Ye batata hai ki application yahin se shuru hogi।
+
+Iske andar 3 important annotations hote hain:
+
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan
+1. @SpringBootConfiguration
+
+Ye Spring ko batata hai ki:
+
+“Ye class application ki setting aur bean configuration ke liye hai।”
+
+Saral bhasha mein:
+Yahan hum application ki zaruri settings aur objects define kar sakte hain।
+
+2. @EnableAutoConfiguration
+
+Ye apne aap zaruri configuration kar deta hai।
+
+Jaise agar hum web dependency add karte hain, to Spring Boot khud hi:
+
+Tomcat server setup karta hai
+Web configuration karta hai
+JSON support deta hai
+
+Hume manually configuration likhne ki zarurat nahi padti।
+
+3. @ComponentScan
+
+Ye current package aur uske andar ke sabhi packages ko scan karta hai।
+
+Aur jin classes ke upar:
+
+@Service
+@Controller
+@Repository
+@Component
+
+lage hote hain, unka object automatically bana deta hai।
+
+Interview mein bolne layak short answer
+
+"@SpringBootApplication Spring Boot application ka main annotation hota hai।
+Ye application ko start karne, automatic configuration karne aur components ko scan karne ka kaam karta hai।
+Iske andar @SpringBootConfiguration, @EnableAutoConfiguration aur @ComponentScan shamil hote hain।"
+
+Agar interviewer pooche “Ye kaise kaam karta hai?”
+
+Aap bol sakte ho:
+
+"Jab application start hoti hai aur SpringApplication.run() chalta hai, tab Spring Boot:
+
+packages ko scan karta hai,
+zaruri objects banata hai,
+automatic configuration karta hai,
+aur server start kar deta hai।"
+Ek line mein yaad rakhne wala answer
+
+"@SpringBootApplication application ko shuru karne, automatic setup karne aur classes ko scan karne ka kaam karta hai।"
+
+hindi mein likho
+
+@SpringBootApplication स्प्रिंग बूट एप्लिकेशन का मुख्य Annotation होता है।
+यह बताता है कि एप्लिकेशन यहीं से शुरू होगी।
+
+इसके अंदर 3 महत्वपूर्ण Annotations शामिल होते हैं:
+
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan
+1. @SpringBootConfiguration
+
+यह स्प्रिंग को बताता है कि यह क्लास एप्लिकेशन की Configuration और Settings के लिए है।
+
+सरल शब्दों में:
+यहीं पर हम Beans और ज़रूरी Configuration बना सकते हैं।
+
+2. @EnableAutoConfiguration
+
+यह अपने आप आवश्यक Configuration कर देता है।
+
+उदाहरण:
+
+अगर हम Web Dependency जोड़ते हैं, तो Spring Boot खुद ही:
+
+Tomcat Server शुरू कर देता है
+Spring MVC Configure कर देता है
+JSON Support दे देता है
+
+हमें Manual Configuration लिखने की ज़रूरत नहीं पड़ती।
+
+3. @ComponentScan
+
+यह Current Package और उसके अंदर के सभी Packages को Scan करता है।
+
+और जिन Classes के ऊपर:
+
+@Service
+@Controller
+@Repository
+@Component
+
+लगा होता है, उनका Object अपने आप बना देता है।
+
+यह कैसे काम करता है?
+
+जब हम:
+
+SpringApplication.run()
+
+चलाते हैं, तब Spring Boot:
+
+Packages को Scan करता है
+ज़रूरी Beans बनाता है
+Automatic Configuration करता है
+Server Start करता है
+इंटरव्यू में बोलने लायक उत्तर
+
+"@SpringBootApplication Spring Boot एप्लिकेशन का मुख्य Annotation है।
+यह Application को Start करने, Automatic Configuration करने और Components को Scan करने का काम करता है।
+इसके अंदर @SpringBootConfiguration, @EnableAutoConfiguration और @ComponentScan शामिल होते हैं।"
+
+एक लाइन में याद रखने वाला उत्तर
+
+"@SpringBootApplication एप्लिकेशन को शुरू करने, Automatic Setup करने और Classes को Scan करने का काम करता है।"
+==================SpringBootApplication=========================
+
+@SpringBootApplication
+How many type of token
+You need to provide access if validated else retrun invalid access.
+kafka database to topic update.
+select * from customers where city ='Delhi';
+select * from orders where amount>500;
+select * from orders order by amount desc;
+select count(*) from customers;
+select customer_id, count(*) as total_customer from orders group by customer_id;
+select customer_id, sum(amount) as total_amount_spend from orders group by customer_id;
+select avg(amount) as avg_amount from orders
+select customer_id, max(amount) as heighest_amount_spend from orders group by customer_id;
+
+
+Here’s a compact but solid SQL practice set covering `JOIN`, `GROUP BY`, `COUNT`, `ORDER BY`, filtering, aggregation, subqueries, and more.
+
+---
+
+# Practice Database
+
+-- Create Customers Table
+CREATE TABLE Customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    city VARCHAR(100)
+);
+
+-- Create Orders Table
+CREATE TABLE Orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    amount DECIMAL(10,2),
+    order_date DATE,
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
+);
+
+-- Create Products Table
+CREATE TABLE Products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    price DECIMAL(10,2)
+);
+
+-- Create Order_Items Table
+CREATE TABLE Order_Items (
+    item_id INT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+
+-- Insert into Customers
+INSERT INTO Customers (customer_id, name, city) VALUES
+(1, 'Alice', 'Delhi'),
+(2, 'Bob', 'Mumbai'),
+(3, 'Charlie', 'Delhi'),
+(4, 'David', 'Pune');
+
+-- Insert into Orders
+INSERT INTO Orders (order_id, customer_id, amount, order_date) VALUES
+(101, 1, 500, '2025-01-10'),
+(102, 2, 700, '2025-01-11'),
+(103, 1, 300, '2025-01-12'),
+(104, 3, 900, '2025-01-15'),
+(105, 2, 200, '2025-01-18');
+
+-- Insert into Products
+INSERT INTO Products (product_id, product_name, price) VALUES
+(1, 'Laptop', 60000),
+(2, 'Mouse', 500),
+(3, 'Keyboard', 1500);
+
+-- Insert into Order_Items
+INSERT INTO Order_Items (item_id, order_id, product_id, quantity) VALUES
+(1, 101, 1, 1),
+(2, 101, 2, 2),
+(3, 102, 3, 1),
+(4, 103, 2, 1),
+(5, 104, 1, 1);
+
+Use these tables:
+
+## Customers
+
+| customer_id | name    | city   |
+| ----------- | ------- | ------ |
+| 1           | Alice   | Delhi  |
+| 2           | Bob     | Mumbai |
+| 3           | Charlie | Delhi  |
+| 4           | David   | Pune   |
+
+## Orders
+
+| order_id | customer_id | amount | order_date |
+| -------- | ----------- | ------ | ---------- |
+| 101      | 1           | 500    | 2025-01-10 |
+| 102      | 2           | 700    | 2025-01-11 |
+| 103      | 1           | 300    | 2025-01-12 |
+| 104      | 3           | 900    | 2025-01-15 |
+| 105      | 2           | 200    | 2025-01-18 |
+
+## Products
+
+| product_id | product_name | price |
+| ---------- | ------------ | ----- |
+| 1          | Laptop       | 60000 |
+| 2          | Mouse        | 500   |
+| 3          | Keyboard     | 1500  |
+
+## Order_Items
+
+| item_id | order_id | product_id | quantity |
+| ------- | -------- | ---------- | -------- |
+| 1       | 101      | 1          | 1        |
+| 2       | 101      | 2          | 2        |
+| 3       | 102      | 3          | 1        |
+| 4       | 103      | 2          | 1        |
+| 5       | 104      | 1          | 1        |
+
+---
+
+# Beginner Queries
+
+## 1. Select all customers
+
+```sql
+SELECT * FROM Customers;
+```
+
+---
+
+## 2. Customers from Delhi
+
+```sql
+SELECT * 
+FROM Customers
+WHERE city = 'Delhi';
+```
+
+---
+
+## 3. Orders above 500
+
+```sql
+SELECT *
+FROM Orders
+WHERE amount > 500;
+```
+
+---
+
+## 4. Sort orders by amount descending
+
+```sql
+SELECT *
+FROM Orders
+ORDER BY amount DESC;
+```
+
+---
+
+# COUNT + GROUP BY Practice
+
+## 5. Count total customers
+
+```sql
+SELECT COUNT(*) AS total_customers
+FROM Customers;
+```
+
+---
+
+## 6. Count orders per customer
+
+```sql
+SELECT customer_id, COUNT(*) AS total_orders
+FROM Orders
+GROUP BY customer_id;
+```
+
+---
+
+## 7. Total amount spent by each customer
+
+```sql
+SELECT customer_id, SUM(amount) AS total_spent
+FROM Orders
+GROUP BY customer_id;
+```
+
+---
+
+## 8. Average order amount
+
+```sql
+SELECT AVG(amount) AS avg_order
+FROM Orders;
+```
+
+---
+
+## 9. Highest order amount by customer
+
+```sql
+SELECT customer_id, MAX(amount) AS highest_order
+FROM Orders
+GROUP BY customer_id;
+```
+
+---
+
+# JOIN Practice
+
+## 10. Inner Join customers and orders
+
+```sql
+SELECT Customers.name, Orders.order_id, Orders.amount
+FROM Customers
+INNER JOIN Orders
+ON Customers.customer_id = Orders.customer_id;
+```
+
+---
+
+## 11. Left Join (show all customers)
+
+```sql
+SELECT Customers.name, Orders.order_id
+FROM Customers
+LEFT JOIN Orders
+ON Customers.customer_id = Orders.customer_id;
+```
+
+---
+
+## 12. Product names in each order
+
+```sql
+SELECT Orders.order_id, Products.product_name
+FROM Order_Items
+JOIN Orders
+ON Order_Items.order_id = Orders.order_id
+JOIN Products
+ON Order_Items.product_id = Products.product_id;
+```
+
+---
+
+# GROUP BY + HAVING
+
+## 13. Customers with more than 1 order
+
+```sql
+SELECT customer_id, COUNT(*) AS total_orders
+FROM Orders
+GROUP BY customer_id
+HAVING COUNT(*) > 1;
+```
+
+---
+
+## 14. Cities having more than 1 customer
+
+```sql
+SELECT city, COUNT(*) AS total_customers
+FROM Customers
+GROUP BY city
+HAVING COUNT(*) > 1;
+```
+
+---
+
+# Multi-table Aggregation
+
+## 15. Total revenue generated by each product
+
+```sql
+SELECT Products.product_name,
+       SUM(Order_Items.quantity * Products.price) AS revenue
+FROM Order_Items
+JOIN Products
+ON Order_Items.product_id = Products.product_id
+GROUP BY Products.product_name;
+```
+
+---
+
+# Intermediate Practice
+
+## 16. Customer who spent the most
+
+```sql
+SELECT Customers.name,
+       SUM(Orders.amount) AS total_spent
+FROM Customers
+JOIN Orders
+ON Customers.customer_id = Orders.customer_id
+GROUP BY Customers.name
+ORDER BY total_spent DESC
+LIMIT 1;
+```
+
+---
+
+## 17. Second highest order amount
+
+```sql
+SELECT DISTINCT amount
+FROM Orders
+ORDER BY amount DESC
+LIMIT 1 OFFSET 1;
+```
+
+---
+
+## 18. Customers who never ordered
+
+```sql
+SELECT Customers.name
+FROM Customers
+LEFT JOIN Orders
+ON Customers.customer_id = Orders.customer_id
+WHERE Orders.order_id IS NULL;
+```
+
+---
+
+# Subquery Practice
+
+## 19. Orders above average amount
+
+```sql
+SELECT *
+FROM Orders
+WHERE amount > (
+    SELECT AVG(amount)
+    FROM Orders
+);
+```
+
+---
+
+## 20. Customers with highest total spending
+
+```sql
+SELECT name
+FROM Customers
+WHERE customer_id = (
+    SELECT customer_id
+    FROM Orders
+    GROUP BY customer_id
+    ORDER BY SUM(amount) DESC
+    LIMIT 1
+);
+```
+
+---
+
+# Advanced JOIN Practice
+
+## 21. Total products in each order
+
+```sql
+SELECT order_id,
+       SUM(quantity) AS total_items
+FROM Order_Items
+GROUP BY order_id;
+```
+
+---
+
+## 22. Full order details
+
+```sql
+SELECT Customers.name,
+       Orders.order_id,
+       Products.product_name,
+       Order_Items.quantity
+FROM Customers
+JOIN Orders
+ON Customers.customer_id = Orders.customer_id
+JOIN Order_Items
+ON Orders.order_id = Order_Items.order_id
+JOIN Products
+ON Order_Items.product_id = Products.product_id;
+```
+
+---
+
+# Very Important Interview Questions
+
+## 23. Difference between WHERE and HAVING
+
+* `WHERE` filters rows before grouping
+* `HAVING` filters groups after `GROUP BY`
+
+Example:
+
+```sql
+SELECT customer_id, SUM(amount)
+FROM Orders
+WHERE amount > 200
+GROUP BY customer_id
+HAVING SUM(amount) > 700;
+```
+
+---
+
+## 24. Difference between INNER JOIN and LEFT JOIN
+
+* `INNER JOIN` → matching rows only
+* `LEFT JOIN` → all left table rows + matching rows
+
+---
+
+# Real Practice Tasks
+
+Try solving these yourself:
+
+1. Find top 3 highest spending customers.
+2. Find city-wise total sales.
+3. Find products never ordered.
+4. Find monthly revenue.
+5. Find duplicate customer cities.
+6. Find customers with average order > 400.
+7. Find most sold product.
+8. Find order containing maximum items.
+9. Find customers who ordered Laptop.
+10. Find total revenue by city.
+
+---
+
+# Important SQL Topics To Practice Next
+
+* `CASE WHEN`
+* `UNION`
+* `CTE`
+* `WINDOW FUNCTIONS`
+* `ROW_NUMBER()`
+* `RANK()`
+* `DENSE_RANK()`
+* `SELF JOIN`
+* `INDEX`
+* `NORMALIZATION`
+
+Example window function:
+
+```sql
+SELECT customer_id,
+       amount,
+       RANK() OVER (ORDER BY amount DESC) AS ranking
+FROM Orders;
+```
+
+If you want, I can also give:
+
+* 50 SQL interview questions
+* LeetCode-style SQL problems
+* SQL cheatsheet PDF-style notes
+* Advanced JOIN diagrams
+* MySQL/PostgreSQL differences
+* SQL mini project for practice
+* Solutions with explanations only after you try yourself
+===================================
+16 May 2026
+
+High throughput refers to a system's ability to process a large volume of work, data, or tasks quickly and efficiently within a specific timeframe. It essentially measures how much work a system can complete per unit of time.
+
+How would implment concurrency in API?
+
+Here are strong **scenario-based interview questions** around designing, developing, and deploying a scalable **Notification Service** using Docker containers, with extensibility for future email/message providers.
+
+---
+
+# Notification Service – Scenario Based Interview Questions
+
+## 1. System Design Scenario
+
+### Scenario:
+
+Your company currently sends notifications using SMTP email only. Tomorrow, the business wants to add:
+
+* SendGrid
+* AWS SES
+* WhatsApp
+* SMS
+* Push notifications
+
+without changing existing business logic.
+
+### Questions:
+
+1. How would you design the notification service architecture?
+2. Which design patterns would you use for extensibility?
+3. How would you make provider integration plug-and-play?
+4. How would you avoid tight coupling?
+5. How would you implement provider failover?
+6. How would you support retry and dead-letter queues?
+7. How would you support multi-channel notifications?
+8. How would you prioritize notifications (critical vs promotional)?
+
+---
+
+# 2. API Design Scenario
+
+### Scenario:
+
+Multiple applications consume your notification service.
+
+### Questions:
+
+1. Design REST APIs for:
+
+   * Send notification
+   * Check notification status
+   * Retry failed notification
+   * Schedule notification
+2. What request payload structure would you use?
+3. How would you support template-based notifications?
+4. How would you handle idempotency?
+5. How would you secure APIs?
+6. How would rate limiting work?
+
+---
+
+# 3. Database Design Scenario
+
+### Scenario:
+
+Your service handles 50 million notifications/day.
+
+### Questions:
+
+1. What database would you choose and why?
+2. What tables/collections are required?
+3. How would you design notification history storage?
+4. How would you archive old notifications?
+5. How would you optimize querying notification status?
+6. Would you use SQL or NoSQL?
+7. How would you ensure transactional consistency?
+
+---
+
+# 4. Event-Driven Architecture Scenario
+
+### Scenario:
+
+The notification system must process huge traffic spikes during sales events.
+
+### Questions:
+
+1. Would you use Kafka/RabbitMQ/SQS? Why?
+2. How would message queues improve scalability?
+3. How would consumers process notifications?
+4. How would you avoid duplicate processing?
+5. How would you implement retry mechanisms?
+6. What happens if a consumer crashes?
+7. How would you ensure at-least-once delivery?
+
+---
+
+# 5. Extensibility Scenario
+
+### Scenario:
+
+A new email provider must be integrated within 2 hours without changing core code.
+
+### Questions:
+
+1. How would you design interfaces/abstractions?
+2. Explain how Strategy Pattern fits here.
+3. How would Dependency Injection help?
+4. How would you dynamically load providers?
+5. How would configuration-driven providers work?
+6. How would you support feature toggles?
+
+### Expected Concepts:
+
+* Strategy Pattern
+* Factory Pattern
+* Adapter Pattern
+* Open/Closed Principle
+* Interface Segregation
+
+---
+
+# 6. Failure Handling Scenario
+
+### Scenario:
+
+AWS SES is down.
+
+### Questions:
+
+1. How would your system detect provider failure?
+2. How would failover to another provider happen?
+3. How would circuit breaker pattern help?
+4. How would retries work?
+5. What logs and alerts are required?
+6. How would you prevent message loss?
+
+---
+
+# 7. Docker Deployment Scenario
+
+### Scenario:
+
+The notification service must be deployed in Docker containers.
+
+### Questions:
+
+1. Write a Dockerfile for the notification service.
+2. How would you reduce Docker image size?
+3. Explain multi-stage builds.
+4. How would environment variables be managed?
+5. How would secrets be handled securely?
+6. How would Docker Compose help?
+7. How would you containerize:
+
+   * API service
+   * Queue consumer
+   * Database
+   * Redis
+8. How would health checks work?
+
+---
+
+# 8. Kubernetes / Scaling Scenario
+
+### Scenario:
+
+Traffic increases from 1K to 1M notifications/minute.
+
+### Questions:
+
+1. How would you autoscale containers?
+2. What Kubernetes resources would you use?
+3. How would HPA work?
+4. How would you implement rolling deployments?
+5. How would zero-downtime deployment work?
+6. How would you monitor pod failures?
+7. How would you handle distributed tracing?
+
+---
+
+# 9. Security Scenario
+
+### Scenario:
+
+The notification service sends OTPs and sensitive emails.
+
+### Questions:
+
+1. How would you encrypt sensitive data?
+2. How would secrets management work?
+3. How would OAuth/JWT authentication work?
+4. How would you prevent abuse/spam?
+5. How would audit logging work?
+6. How would you ensure GDPR compliance?
+
+---
+
+# 10. Observability Scenario
+
+### Scenario:
+
+Business complains that notifications are delayed.
+
+### Questions:
+
+1. How would you troubleshoot?
+2. Which metrics would you monitor?
+3. What dashboards would you create?
+4. How would distributed tracing help?
+5. Which logging framework would you use?
+6. How would alerting work?
+
+---
+
+# 11. CI/CD Scenario
+
+### Scenario:
+
+Developers deploy notification service updates daily.
+
+### Questions:
+
+1. Design CI/CD pipeline for this service.
+2. How would automated testing work?
+3. How would Docker images be versioned?
+4. How would rollback happen?
+5. How would blue-green deployment work?
+6. How would secrets be injected during deployment?
+
+---
+
+# 12. Real Production Problem Scenarios
+
+## Scenario A – Duplicate Notifications
+
+Users receive duplicate emails.
+
+### Questions:
+
+* Root cause possibilities?
+* How would idempotency solve this?
+* How would deduplication work?
+
+---
+
+## Scenario B – Notification Delay
+
+Notifications delayed by 30 minutes.
+
+### Questions:
+
+* Where would you investigate first?
+* Queue lag handling?
+* Consumer bottleneck troubleshooting?
+
+---
+
+## Scenario C – Email Blacklisting
+
+Your email domain is blacklisted.
+
+### Questions:
+
+* How would you monitor reputation?
+* How would fallback providers help?
+* SPF/DKIM/DMARC importance?
+
+---
+
+# 13. Coding + Low-Level Design Scenario
+
+### Scenario:
+
+Implement provider extensibility.
+
+### Questions:
+
+1. Write interface for NotificationProvider.
+2. Implement:
+
+   * EmailProvider
+   * SMSProvider
+   * PushProvider
+3. Add new provider without changing existing code.
+4. Implement Factory Pattern.
+5. Implement retry mechanism.
+6. Add asynchronous processing.
+
+---
+
+# 14. Architecture Whiteboard Scenario
+
+### Ask Candidate To Draw:
+
+* API Gateway
+* Notification API
+* Queue
+* Worker Consumers
+* Provider Layer
+* Retry Queue
+* Dead Letter Queue
+* Redis Cache
+* Monitoring Stack
+* Docker/Kubernetes Deployment
+
+---
+
+# 15. Senior-Level Discussion Questions
+
+1. Monolith vs Microservice for notification system?
+2. Sync vs Async notifications?
+3. Kafka vs RabbitMQ tradeoffs?
+4. Event sourcing benefits?
+5. Multi-region deployment strategy?
+6. Cost optimization strategies?
+7. CAP theorem relevance?
+8. How would you handle 99.99% availability?
+
+---
+
+# Ideal Architecture Candidate Should Reach
+
+A strong answer usually includes:
+
+* API Layer
+* Queue-based async processing
+* Provider abstraction layer
+* Retry + DLQ
+* Redis caching
+* Dockerized microservices
+* Kubernetes deployment
+* Monitoring + tracing
+* Extensible plugin/provider architecture
+* Config-driven integrations
+
+---
+
+# Bonus: Follow-Up Practical Tasks
+
+You can also ask candidates to:
+
+1. Write Dockerfile
+2. Create docker-compose.yml
+3. Build notification worker
+4. Implement retry queue
+5. Integrate SendGrid
+6. Add provider failover
+7. Deploy on Kubernetes
+8. Add Prometheus metrics
+9. Create Helm chart
+10. Design database schema
+
+
+====================
+
+Top 5 to 10 system design scenarios ask for interviews? like Bidding system, Youtube, notification and others?
+
+Here are the Top 15 Most Asked System Design Interview Scenarios for SDE-2, Senior Engineer, Tech Lead, and Architect interviews.
+
+These are heavily asked in:
+
+Product companies
+FAANG
+Startups
+FinTech
+E-commerce
+SaaS platforms
+Top System Design Interview Scenarios
+1. Notification Service
+Common Features
+Email
+SMS
+Push notifications
+Retry mechanism
+Dead Letter Queue
+Provider failover
+Key Concepts Tested
+Async processing
+Queue systems
+Retry strategy
+Extensible architecture
+High throughput
+Technologies
+Kafka / RabbitMQ
+Redis
+Docker
+Kubernetes
+2. YouTube / Video Streaming Platform
+Features
+Upload videos
+Streaming
+Recommendations
+Likes/comments
+CDN delivery
+Key Concepts
+Video transcoding
+Blob storage
+CDN
+Metadata service
+Event-driven architecture
+Concepts Interviewers Expect
+Chunk streaming
+Adaptive bitrate
+Scalability
+Caching
+3. Real-Time Bidding / Auction System
+Features
+Live bidding
+Bid ordering
+Real-time updates
+Fraud detection
+Auction timer
+Key Concepts
+WebSockets
+Distributed locking
+Strong consistency
+Event ordering
+Common Questions
+How to avoid duplicate bids?
+How to handle concurrent bidding?
+How to ensure fairness?
+4. URL Shortener (TinyURL/Bitly)
+Features
+Short URL generation
+Redirection
+Analytics
+Expiration
+Key Concepts
+Hashing
+Base62 encoding
+Database sharding
+Caching
+Why Asked Often
+
+Simple problem but tests:
+
+scalability
+database design
+traffic optimization
+5. Ride Sharing System (Uber/Ola)
+Features
+Driver matching
+Real-time tracking
+ETA calculation
+Surge pricing
+Key Concepts
+Geo-spatial indexing
+Real-time location updates
+Pub/Sub systems
+Matching algorithms
+6. Chat System (WhatsApp/Slack)
+Features
+Real-time messaging
+Online presence
+Group chats
+Message delivery status
+Key Concepts
+WebSockets
+Message queues
+Offline sync
+Event streaming
+Advanced Topics
+End-to-end encryption
+Read receipts
+Multi-device sync
+7. Food Delivery System (Swiggy/Zomato)
+Features
+Restaurant search
+Order tracking
+Delivery assignment
+Payments
+Key Concepts
+Geo services
+Order state machine
+Real-time tracking
+Distributed transactions
+8. E-Commerce Platform (Amazon/Flipkart)
+Features
+Product catalog
+Cart
+Checkout
+Inventory
+Recommendation engine
+Key Concepts
+Inventory consistency
+Search indexing
+Payment orchestration
+Distributed systems
+Frequently Asked
+Prevent overselling inventory
+Design flash sale system
+9. Payment Gateway / Wallet System
+Features
+Money transfer
+Transaction ledger
+Refunds
+Fraud checks
+Key Concepts
+ACID transactions
+Idempotency
+Double-entry bookkeeping
+Security
+Critical Areas
+Consistency
+Failure recovery
+Audit logging
+10. Social Media Feed (Facebook/Twitter/X)
+Features
+News feed
+Follow/unfollow
+Likes/comments
+Trending posts
+Key Concepts
+Fanout
+Feed generation
+Ranking algorithms
+Caching
+Famous Interview Topic
+
+Push vs Pull feed model
+
+11. File Storage System (Google Drive/Dropbox)
+Features
+File upload/download
+Sync
+Sharing
+Versioning
+Key Concepts
+Chunking
+Deduplication
+Distributed storage
+Sync algorithms
+12. Search Engine / Elasticsearch System
+Features
+Full-text search
+Auto-suggestions
+Ranking
+Filtering
+Key Concepts
+Inverted index
+Search ranking
+Tokenization
+Distributed indexing
+13. API Gateway System
+Features
+Authentication
+Routing
+Rate limiting
+Monitoring
+Key Concepts
+Reverse proxy
+Service discovery
+Circuit breaker
+Security
+14. Stock Trading Platform
+Features
+Buy/sell orders
+Order matching
+Portfolio
+Real-time prices
+Key Concepts
+Low latency
+Event sourcing
+Strong consistency
+Order book management
+15. Hotel / Flight Booking System
+Features
+Search availability
+Booking
+Cancellation
+Seat/room locking
+Key Concepts
+Distributed locking
+Reservation consistency
+Saga pattern
+Payment orchestration
+Most Frequently Asked Advanced Variations
+Flash Sale System
+
+(Highly popular recently)
+
+Concepts
+Inventory throttling
+Queue buffering
+Bot prevention
+Distributed cache
+Rate Limiter Design
+Concepts
+Token bucket
+Sliding window
+Distributed counters
+Recommendation Engine
+Concepts
+ML pipelines
+Streaming systems
+Personalization
+What Interviewers Usually Evaluate
+Area	What They Check
+Scalability	Can system handle millions?
+Reliability	Failures/retries?
+Availability	Downtime handling?
+Consistency	Strong/Eventual?
+Security	Auth/encryption?
+Extensibility	Easy to add features?
+Cost Optimization	CDN/cache/storage choices
+Observability	Logs/metrics/tracing
+Most Important Topics To Prepare
+Must Know
+Load balancer
+Caching
+Database sharding
+Replication
+Message queues
+CDN
+Microservices
+Docker/Kubernetes
+Most Asked Technologies
+Problem	Common Tech
+Queue	Kafka, RabbitMQ
+Cache	Redis
+Search	Elasticsearch
+DB	PostgreSQL, Cassandra
+Streaming	Kafka
+Container	Docker
+Orchestration	Kubernetes
+Best Order To Practice
+Beginner
+URL Shortener
+Notification Service
+Rate Limiter
+Intermediate
+Chat App
+YouTube
+Food Delivery
+Advanced
+Bidding System
+Payment Gateway
+Stock Trading
+Uber
+Common Follow-Up Questions
+
+Interviewers usually ask:
+
+How will you scale it?
+What if DB fails?
+How to avoid duplicates?
+How to deploy using Docker/K8s?
+How to monitor?
+How to support multi-region?
+SQL or NoSQL and why?
+CAP theorem tradeoff?
+Event-driven or synchronous?
+Strong Recommendation
+
+If preparing for senior interviews, deeply prepare these 8:
+
+Notification Service
+YouTube
+Chat System
+Payment Gateway
+Auction/Bidding
+Uber
+E-commerce
+URL Shortener
+
+These cover almost all distributed system concepts.
+
+================
+veersa tech
+
+Senario based interview questions
+Need to Design Notification Service, Development and Deployment (using docker container)
+SMS and Email service would take differnent procesing time, how would you configure this deley.
+
+=====================
+14 May 2026
+The Java Cryptography Architecture (JCA)
+https://www.geeksforgeeks.org/java/encrypt-and-decrypt-string-file-using-java/
+
+The CAP theorem is a principle in distributed computing that says a distributed system can guarantee only **two out of these three properties at the same time**:
+1. **Consistency (C)**
+   Every user sees the same data at the same time.
+   After a write, all reads return the latest value.
+2. **Availability (A)**
+   Every request gets a response, even if some servers are down.
+3. **Partition Tolerance (P)**
+   The system continues working even when network communication between nodes fails.
+
+The theorem states:
+> During a network partition, a distributed system must choose between **Consistency** and **Availability**.
+---
+### Visual idea
+
+```
+        CAP Theorem
+
+           Consistency
+               /\
+              /  \
+             /    \
+            /      \
+ Availability ---- Partition Tolerance
+```
+
+In real distributed systems, **Partition Tolerance is usually mandatory**, because network failures can always happen.
+So systems typically choose between:
+* **CP systems** → Consistency + Partition Tolerance
+* **AP systems** → Availability + Partition Tolerance
+---
+### Examples
+#### CP Systems
+Prioritize correct and consistent data.
+Examples:
+* MongoDB (with strong consistency settings)
+* HBase
+* ZooKeeper
+
+Behavior:
+* May reject requests during network failures.
+* Data remains accurate.
+---
+#### AP Systems
+
+Prioritize always responding.
+
+Examples:
+
+* Cassandra
+* DynamoDB
+
+Behavior:
+
+* System keeps serving requests.
+* Different nodes may temporarily show different data.
+
+---
+
+### Simple analogy
+
+Imagine bank servers in two cities lose internet connection:
+
+* If both continue independently → users may see different balances (**Availability over Consistency**).
+* If one stops transactions until reconnection → data stays correct but service may be unavailable (**Consistency over Availability**).
+
+---
+
+### Important note
+
+Many modern systems use **eventual consistency**, meaning:
+
+* Data may be temporarily inconsistent,
+* But all nodes eventually become consistent.
+
+This is common in large-scale cloud systems.
+
+For deeper reading:
+
+* [MongoDB CAP theorem explanation](https://www.mongodb.com/resources/basics/databases/cap-theorem?utm_source=chatgpt.com)
+* [AWS distributed systems guide](https://aws.amazon.com/builders-library/?utm_source=chatgpt.com)
+
+HCL, which stands for HashiCorp Configuration Language
+https://youtu.be/UR665AHN9yE
+=================
+
+Funct
+https://youtu.be/UR665AHN9yEional Requirements
+1. Users should be able to upload videos
+2. Users should be able to watch/stream videos
+Scale
+~1M uploads/day
+100M DAU
+Max video size of 256GB
+Non-functional Requirements
+- Availability >> consistency for video uploads
+support uploading/streaming for large videos (2566B)
+-low latency streaming (<500ms) true in low bandwidth
+-scalability to scale to 1M uploads/day and 100M views
+
+=================
+Learn -> System Disign -> Framework
+
+How to approach to a HLD question,
+
+1) Requirements
+2) Core Entities
+3) API or Interface
+4) Data flow [Optional]
+5) High Level Design
+6) Deep dives
+
+Requirements: Talk about Functional and Non-Functional requirements
+Functional: These are your "Users/Clients should be able to..." statements.
+Non-Functional: These are statements about the system qualities that are important to your users. These can be phrased as "The system should be able to..." or "The system should be..." statements.
+
+Core Entities: Identify and list the core entities of your system. This helps you to define terms, understand the data central to your design, and gives you a foundation to build on. These are the core entities that your API will exchange and that your system will persist in a Data Model.
+
+API or Interface: Define the contract between your system and its users. Oftentimes, especially for full product style interviews, this maps directly to the functional requirements you've already identified (but not always!). You will use this contract to guide your high-level design and to ensure that you're meeting the requirements you've identified.
+
+Data flow: For some backend systems, especially data-processing systems, it can be helpful to describe the high level sequence of actions or processes that the system performs on the inputs to produce the desired outputs. If your system doesn't involve a long sequence of actions, skip this!
+
+High Level Design: Now that you have a clear understanding of the requirements, entities, and API of your system, you can start to design the high-level architecture. This consists of drawing boxes and arrows to represent the different components of your system and how they interact. Components are basic building blocks like servers, databases, caches, etc
+
+Don't over think this! Your primary goal is to design an architecture that satisfies the API you've designed and, thus, the requirements you've identified
+
+Deep dives: Now that you have a high-level design in place you're going to harden your design by:
+-> Ensuring it meets all of your non-functional requirements
+-> Addressing edge cases
+-> Identifying and addressing issues and bottlenecks
+-> Improving the design based on probes from your interviewer.
+
+Credits Hello Interview, Thanks Stefan Mai and Evan King for creating such a nice platform. I'm truly enjoying the content.
+https://www.linkedin.com/posts/shivaprasadgurram_how-to-approach-to-a-hld-question-1-requirements-activity-7447483648636907523-tX0J
+Non-functional Requirements
+Learn -> System Disign -> Framework
+https://www.hellointerview.com/learn/system-design/in-a-hurry/delivery
+
+YouTube
+YouTube is a video-sharing platform that allows users to upload, view, and interact with video content. As of this video, it is the second most visited website in the world
+Primary Goal: Satisfy Non-functional Requirements
+Primary Goal: Satisfy Functional Requirements
+Requirements
+Core Entities
+API or Interface
+Data Flow
+High-level Design
+Deep Dives
+https://youtu.be/IUrQ5_g3XKs
+hellow interview
+
+How would you design your system to allow users to resume watching a video from where they left off, even if they switch devices?
+Update your design if needed and describe how the changes answer the question.
+You've designed a solid solution using periodic server updates to track video positions, with an efficient key structure for storing user-video positions
+Your choice of Redis as a caching solution provides fast retrieval of playback positions across devices
+You've effectively addressed the cross-device requirement by maintaining server-side state
+What didn't
+While periodic updates work well, consider combining them with event-based updates (like when users pause or close the video) to provide more precise position tracking and better handle unexpected app closures Want to learn more?
+
+Understand the Problem
+What is YouTube?
+YouTube is a video-sharing platform that allows users to upload, view, and interact with video content. As of this writing, it is the second most visited website in the world.
+There's some conceptual overlap between this question and designing Dropbox. If you're less familiar with system design principles for file upload / download designs, I'd recommend reading that guide first.
+
+Functional Requirements
+Core Requirements
+1. Users can upload videos.
+2. Users can watch (stream) videos.
+Below the line (out of scope)
+Users can view information about a video, such as view counts.
+Users can search for videos.
+Users can comment on videos.
+Users can see recommended videos.
+Users can make a channel and manage their channel.
+Users can subscribe to channels
+Practice This Problem
+Mock interviews with FAANG engineers
+Up to 15% off
+Practice with a senior+ engineer
+from your dream company.
+Learn More
+On This Page
+Understand the Problem
+Functional Requirements
+
+Non-Functional Requirements
+==========================
+Scalability → Ability to handle more users/work by adding resources.
+Low Latency → Fast response time with minimal delay.
+Reliability → System works correctly and consistently.
+Fault Tolerance → System continues working even when some parts fail.
+
+The Set Up
+Planning the Approach
+Defining the Core Entities
+The API
+High-Level Design
+Background: Video Streaming
+1) Users can upload videos
+2) Users can watch videos
+Potential Deep Dives
+1) How can we handle processing a vi...
+2) How do we support resumable upl...
+3) How do we scale to a large number....
+Some additional deep dives you migh.....
+What is Expected at Each Level?
+Mid-level
+Senior
+Staff
+==================
+13 May 2026
+customer make order but not successful payment
+
+select customer  -> order_item -> orders --> payment
+, order o,payment pay, products p
+orders -> order_items -> products
+
+SELECT DISTINCT
+    c.customer_id,
+    c.name, p.payment_id, p.status
+FROM customers c
+JOIN orders o
+    ON c.customer_id = o.customer_id
+LEFT JOIN payments p
+    ON o.order_id = p.order_id
+    AND p.status = 'SUCCESS'
+WHERE p.payment_id IS NULL;
+
+SELECT * FROM orders o
+JOIN customers c ON c.customer_id = o.customer_id
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN products p ON p.product_id = oi.product_id
+JOIN payments pay ON pay.order_id = oi.order_id
+
+SELECT * FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+LEFT JOIN payments pay ON pay.order_id = oi.order_id AND pay.status = 'FAILED'
+
+SELECT
+    c.customer_id,
+    c.name,
+    c.region
+FROM customers c
+LEFT JOIN orders o
+    ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;
+
+CREATE TABLE customers (
+  customer_id INT PRIMARY KEY, 
+  name VARCHAR(100), 
+  region VARCHAR(50), 
+  created_at DATETIME
+);
+
+CREATE TABLE orders order_id
+  order_id INT PRIMARY KEY, 
+  customer_id INT, 
+  status ENUM(
+    'PENDING', 'CONFIRMED', 'SHIPPED', 
+    'CANCELLED', 'RETURNED'
+  ), 
+  amount DECIMAL(10, 2), 
+  order_date DATETIME, 
+  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+CREATE TABLE order_items (
+  item_id INT PRIMARY KEY, 
+  order_id INT, 
+  product_id INT, 
+  quantity INT, 
+  unit_price DECIMAL(10, 2), 
+  FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+
+CREATE TABLE products (
+  product_id INT PRIMARY KEY, 
+  name VARCHAR(100), 
+  category VARCHAR(50), 
+  cost_price DECIMAL(10, 2)
+);
+
+CREATE TABLE payments (
+  payment_id INT PRIMARY KEY, 
+  order_id INT, 
+  paid_at DATETIME, 
+  method ENUM(
+    'UPI', 'CARD', 'NETBANKING', 'COD'
+  ), 
+  status ENUM('SUCCESS', 'FAILED', 'REFUNDED'), 
+  FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+
+
+-- CUSTOMERS
+INSERT INTO customers (customer_id, name, region, created_at) VALUES
+(1, 'Amit Sharma', 'North', CURRENT_TIMESTAMP),
+(2, 'Priya Verma', 'South', CURRENT_TIMESTAMP),
+(3, 'Rahul Mehta', 'West', CURRENT_TIMESTAMP),
+(4, 'Sneha Kapoor', 'East', CURRENT_TIMESTAMP);
+
+-- PRODUCTS
+INSERT INTO products (product_id, name, category, cost_price) VALUES
+(101, 'Laptop', 'Electronics', 55000.00),
+(102, 'Smartphone', 'Electronics', 25000.00),
+(103, 'Office Chair', 'Furniture', 7000.00),
+(104, 'Headphones', 'Accessories', 1500.00),
+(105, 'Desk Lamp', 'Home Decor', 1200.00);
+
+-- ORDERS
+INSERT INTO orders (order_id, customer_id, status, amount, order_date) VALUES
+(1001, 1, 'CONFIRMED', 56500.00, CURRENT_TIMESTAMP),
+(1002, 2, 'SHIPPED', 25000.00, CURRENT_TIMESTAMP),
+(1003, 3, 'PENDING', 8200.00, CURRENT_TIMESTAMP),
+(1004, 1, 'CANCELLED', 1500.00, CURRENT_TIMESTAMP),
+(1005, 4, 'RETURNED', 7000.00, CURRENT_TIMESTAMP);
+
+-- ORDER ITEMS
+INSERT INTO order_items (item_id, order_id, product_id, quantity, unit_price) VALUES
+(1, 1001, 101, 1, 55000.00),
+(2, 1001, 104, 1, 1500.00),
+(3, 1002, 102, 1, 25000.00),
+(4, 1003, 103, 1, 7000.00),
+(5, 1003, 105, 1, 1200.00),
+(6, 1004, 104, 1, 1500.00),
+(7, 1005, 103, 1, 7000.00);
+
+-- PAYMENTS
+INSERT INTO payments (payment_id, order_id, paid_at, method, status) VALUES
+(5001, 1001, CURRENT_TIMESTAMP, 'CARD', 'SUCCESS'),
+(5002, 1002, CURRENT_TIMESTAMP, 'UPI', 'SUCCESS'),
+(5003, 1003, CURRENT_TIMESTAMP, 'NETBANKING', 'FAILED'),
+(5004, 1004, CURRENT_TIMESTAMP, 'COD', 'REFUNDED'),
+(5005, 1005, CURRENT_TIMESTAMP, 'CARD', 'REFUNDED');
+
+Writing scalable APIs
+Performance tuning
+Logging & monitoring
+Clean architecture
+
+Legecy Application
+
+Lambda Function
+
+
+List<Order> orders = Araays.as(Order1, Order1);
+double prices = orders.stream().max(Comparator.comparing(o -> o.getPrice())).orElse(0.0);
+.map
+.fiter() 
+.forEach()
+
+Customer customer_id
+Order order_id , customer_id
+OrderItem 
+Product prodduct_id
+
+java - apache web server
+nodejs - nodejs or ngnix server
+API - json response SOAP, REST
+load balancer  -- distrubute load/traffic AWS ELB, 
+DB - MYSQL, POSTGRES, ORACLE
+DOC DB - MONGO, COUGH, Key/value: reddis , amazon dynamo db
+Full text search: Elastic search, Solr
+CDN: Akmai, CloundFront (Gobal App, Cache)
+Distributed storage: Prfile img,video (S3, Hadoob HDFS)
+Monitoring: Kibana, new relic, data dog.
+AWS, GCP, Azure
+Cache Radis, Memcahce
+Message Queue: Asyns, SQS, Kakfa, 
+Analytics: Reporting - Spark, Hadoob
+Scalabity CDN, Cachcing, Load Balencer, Partitioning, Sharding, Distributed System, Auto scaling
+
+
+No. OpenAI
+ tools like ChatGPT are changing what Java developers do, but not eliminating the role.
+
+What is happening instead:
+
+AI replaced parts of the workflow
+
+AI is very good at:
+
+Boilerplate code
+CRUD APIs
+Unit tests
+Refactoring suggestions
+Documentation
+Explaining stack traces
+Converting code between frameworks/languages
+
+A junior developer can now produce code much faster.
+
+But experienced Java developers are still heavily needed
+
+Real production systems involve:
+
+System design
+Distributed architecture
+Database modeling
+Security
+Performance tuning
+Debugging production incidents
+Understanding business logic
+Handling edge cases
+Making tradeoffs under constraints
+
+AI still struggles with:
+
+Large codebase context
+Ambiguous requirements
+Long-term maintainability
+Production accountability
+Architecture decisions across teams
+What changed in the industry
+
+The market increasingly rewards developers who can:
+
+Use AI tools effectively
+Review AI-generated code critically
+Design systems instead of only writing syntax
+Understand infrastructure/cloud/devops
+Own features end-to-end
+
+Go became the language of cloud infrastructure
+A huge part of modern cloud-native tooling is written in Go:
+Docker
+Kubernetes
+Terraform
+Prometheus
+etcd
+Learning Kotlin is much easier if you already know Java.
+https://youtu.be/txid8CQ-7GU
+Design Youtube like application
+Appliation where response data is increasing say 100kb -- 500mp, how handle or design it.
+Buiding System
+1. Login /Registration
+2. Item Listing
+3. Biding 
+4. Biding Histroy
+5. Oction Time
+
+Login/ 
+Registration : - email /phone /Capcha
+Complete Form - Validation - Registration
+API Gateway
+Login/ Authentication
+Security 
+Statbility - Reliencese 
+Connection Polling /Query
+Concurent (Message Broker) -Req
+ExcutorService()
+Log/ Exceptip
+Transaction Atomicity
+Notification Service (Evevt procesing)
+
+forward proxy??
+service mess??
+EP2024IR4580472
+Buiding System
+1. Login /Registration
+2. Item Listing
+3. Biding 
+4. Biding Histroy
+5. Oction Time
+Login/ Registration
+============
+The candidate should be able to: HashMap
+1- Create a table
+2- Insert records
+3- Read records
+4- Update records
+5- Delete records
+
+
+
+package com.test.practical.service;
+
+import com.test.practical.dto.Employee;
+import com.test.practical.repository.EmployeeRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+/*The candidate should be able to:
+1- Create a table
+2- Insert records
+3- Read records
+4- Update records
+5- Delete records
+*/
+
+@Table(name  = "employee")
+@Entity(name = "employee")
+public class Employee {
+
+    @Id
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column
+    private String department;
+
+
+
+@Service
+@RequiredArgsConstructor
+public class EmployeeService {
+
+    private EmployeeRepository employeeRepository;
+
+    // 1 & 2 - Create table and Insert records
+    public Employee saveEmployee(Employee employee) {
+        return employeeRepository.save(employee);
+    }
+
+    // 3 - Read all records
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
+    }
+
+    // Read single record by ID
+    public Optional<Employee> getEmployeeById(Long id) {
+        return employeeRepository.findById(id);
+    }
+
+    // 4 - Update record
+    public Employee updateEmployee(Long id, Employee updatedEmployee) {
+
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        employee.setName(updatedEmployee.getName());
+        employee.setEmail(updatedEmployee.getEmail());
+        employee.setDepartment(updatedEmployee.getDepartment());
+
+        return employeeRepository.save(employee);
+    }
+
+    // 5 - Delete record
+    public String deleteEmployee(Long id) {
+
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        employeeRepository.delete(employee);
+
+        return "Employee deleted successfully";
+    }
+}
+
+Answer these question briefly like interview answers. "What happens when you type something in the browser?
+What happens after that?
+What is the difference between a process and a thread?
+What is multitasking?
+What is required to set up multithreaded functions?
+What is the difference between Docker container and Kubernetes?
+How does TCP differ from UDP?"
+
+Tell me five parameters that you used to compare LLM'S?
+What Grading Model did you use?
+How did you Weight the Comparisons?
+
+What is a docker container?
+Five questions about Kubernates?
+
+https://youtu.be/xOk9iJLugvo
+
+https://youtu.be/jDJYLnmDDvs Spring Cloud | What is Spring Cloud Really All About?
+How to implement thread pool , what’s advantage of thread pool , how many type of thread pool do we have 
+
+java coding example
+https://youtu.be/837cgQcPrM0?list=PLF9tovyahfL020hGgLIsRMZY4bfSLCFUa 
+
+https://blog.udemy.com/25-microservices-questions-and-answers-to-study-before-your-next-interview/?utm_source=adwords&utm_medium=udemyads&utm_campaign=Search_DSA_GammaCatchall_NonP_la.EN_cc.India&campaigntype=Search&portfolio=India&language=EN&product=Course&test=&audience=DSA&topic=&priority=Gamma&utm_content=deal4584&utm_term=_._ag_166578677881_._ad_700948726520_._kw__._de_c_._dm__._pl__._ti_aud-2297301418005:dsa-1456167871416_._li_9302878_._pd__._&matchtype=&gad_source=1&gclid=CjwKCAjw2dG1BhB4EiwA998cqELRFVhBpATQlm5fpFYQuX-37d4c5O_zyDkj7wOwBEBV1onwFHpcXhoCKpIQAvD_BwE
+https://leetcode.com/discuss/interview-question/1342597/publicis-sapient-coding-round
+
+https://youtu.be/kNJ2tjBWlLs
+https://youtu.be/-KE0yms6PJ8
+
+https://youtu.be/q1JQvIS6vto
+Intermediate operations : filter, map, distinct, sorted, limit etc.
+Terminate operations: foreach, collect, reduce, count etc.
+Stream filterStream = originalStream.filter(element->/*predicate*/);
+Filter even num from ArrayList stream
+Stream mappedStream = originalStream.map(element->/*tronsformation function*/);
+
+Rat in a Maze
+Kedane algo
+Coin Change
+activate selection in greedy algo
+https://youtu.be/EglTqS3FYlU
+https://docs.google.com/spreadsheets/d/1k6hcdNsmBPxSPqaqmUpRKqBjax1-miMaRRKcbscL3ow/edit?pli=1&gid=0#gid=0
+
+https://youtu.be/KQDTtvZMS9c
+https://www.youtube.com/watch?v=BwYFuhVhshI
+Download kafka from apache
+config/server.properties, 
+c:/kafka/kafka-logs
+config/zookeeper.properties
+c:/kafka/zookeeper-data
+c:\kafka>
+.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+.\bin\windows\kafka-server-start.bat .\config\server.properties
+windows>
+kafka-topics.bat --create --bootstrap-server localhost:9092 --topic test
+kafka-topics.bat --describe --topic test --bootstrap-server localhost:9092 
+kafka-console-producer.bat --broker-list localhost:9092 –topic test
+kafka-console-consumer.bat --topic test-topic --bootstrap-server localhost:9092 --from-beginning
+{"name":"anup","age":52,"gender":"male"}
+
+kafka>
+.\bin\windows\zookeeper-server-stop.bat .\config\zookeeper.properties
+.\bin\windows\kafka-server-stop.bat .\config\server.properties
+
+
+
+24. Fully Understanding the Component Selector
+  // selector: 'app-root',
+  // selector: '[app-root]',   ==> as attribute
+  selector: '.app-root',  ==> as class
+
+<body>
+	<div app-root></div>
+  <!-- <app-root></app-root> -->
+  <div class="app-root"></div>
+</body>
+
+
+ApplicationUser
+@ManyToMany(name="user_role_junction", joinColumns = {@JoinColumn(name="user_id")},
+inversJoinColumns = {@JoinColumn(name="role_id")})
+private Set<Role> authorities;
+
+ApplicationUser
+@ManyToMany(name="user_role_junction", joinColumns = {@JoinColumn(name="user_id")},
+inversJoinColumns = {@JoinColumn(name="role_id")})
+private Set<Role> authorities;
+
+class Token
+@ManytoOne
+@JoinColumn(name="user_id")
+private User user
+
+class User
+@OneToMany(mappedBy="user")
+private List<Token> tokens
+
+@Query("select t from Token t inner join User u on t.user.id =u.id
+where u.id =: userId and (t.expired=false or t.revoked=false)
+List<Token> findAllValidTokensByUser(Integer userId);
+
+node -e "console.log(require('crypto').(32).toString('hex'))"
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jwt_security
+    username: username
+    password: password
+    driver-class-name: org.postgresql.DriverrandomBytes
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+
+User implements UserDetails
+
+@Enumerated(EnumType.STRING)
+private Role role;
+getAuthorities(){
+	retrun List.of(new SimpleGrantedAuthority(role.name)));
+}
+
+//SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roles.name());
+//return Arrays.asList(authority);
+return List.of(new SimpleGrantedAuthority(roles.name()));
+
+
+public UserDetailsService userDetailsService() {
+        return email -> userRepository.findByEmail(email)
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
+    }
+
+spring.datasource.url=jdbc:h2:file:/data/demo;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=create-drop
+	
+	
+	
+logging.level.root=WARN
+logging.level.web=INFO
+logging.level.com.example=DEBUG	
+
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.Type=TRACE
+	
+spring.datasource.url=jdbc:mysql://localhost:33060/db5
+spring.datasource.username=root
+spring.datasource.password=root
+spring.datasource.testWhileIdle=true
+spring.datasource.validationQuery=SELECT 1
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.hibenate.naming-strategy=org.hibernate.cfg.ImprovedNamingStrategy
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.main.allow-circular-references=true
+
+mysqld --console --initialize --basedir=C:\Users\qxz1mm1\mysql8 --datadir=C:\Users\qxz1mm1\mysqldata
+mysqld --console --datadir=C:\Users\qxz1mm1\mysqldata
+mysql.exe -u root -p
+mysql.exe -u root -p
+alter user 'root'@'localhost' identified by 'root';
+mysqladmin -u root -p root
+port: 33060
+root@localhost: tiibqI7.p&x8
+create table student (id integer(2), name varchar(10));
+insert into student values(1,'ramesh');
+select * from student;
+
+
+Tm2BpKlv1rU
+1. Lambda Expression: Bring functional programming in java, anonymous function
+2. Functional Interface
+3. Default Methods and static methods
+4. Predefined Functional Interfaces (Predicate, Function, Consumer, Supplier)
+5. Double Colon Operator (::) (Method reference, Constructor reference)
+6. Streams
+7. Date and Time API
+8. Optional class
+9. Nashron JavaScript Engine
+
+Lambda expression - No method name, no return type, no modifier
+netstat -ano | findstr :8080
+taskkill /PID 2660 /F
+java-8-new-features-in-simple-way/learn/v4/t/quiz/4463238/test
+Runnable ==> run()
+Callable ==> call()
+Comparable ==> compareTo()
+Camparator ==> compare()
+ActionListner ==> actionPerformed()
+allkeysgenerator.com/Random/SEcurity-Encryption-Key-Generator.apsx
+https://youtu.be/0GGFZdYe-FY How to Logout from Spring Security - JWT
+https://www.youtube.com/watch?v=lJxjTLU9pGs Spring Boot WebFlux : Send SMS/OTP using Twilio | Forgot/Reset Password scenario | JavaTechie
+Recovery code: JCLKT2AMKMTPMBXCPFHVCVBY
+Account SID: ACd00eb9d4f2256ccdb2250e91a52be983
+Auth Token: b2fd4329f8120d30dda896566723848c
+Twilio phone number: +12342941028
+
+https://youtu.be/MWJymqlWzTQ OTP validateOTP
+https://youtu.be/HFQAPW8SMBM Java Coding Interview Questions and Answers | Sorting using comparator
+https://www.youtube.com/watch?v=iDogrHEo4x0
+https://www.youtube.com/watch?v=3etdgEGj-TI
+https://youtu.be/X48mMxEMYps
+https://medium.com/javarevisited/java-11-features-and-highlights-ab4bed23058b JAVA 11
+https://youtu.be/hr2XTbKSdAQ
+https://youtu.be/a3ZdcDvUwdY
+https://youtu.be/lnKPoWZnNNM
+https://youtu.be/J1RmZZEkN0k?list=PLtgomJ95NvbPDMQClkBZPijLdEFyo0VHa
+https://youtu.be/-9VcW7MBDs8
+https://youtu.be/4fqSaiGF2yg
+https://www.youtube.com/watch?v=7fAB4WS29oM MASTER JWT Authentication with Java Spring Boot 3
+https://youtu.be/KxqlJblhzfI Spring Boot 3 + Spring Security 6 - JWT Authentication and Authorisation Amigoscode
+https://www.youtube.com/watch?v=Tm2BpKlv1rU Session - 1
+https://www.youtube.com/watch?v=k2PiRM2d_iU Session - 2
+https://www.youtube.com/watch?v=129QkkXUHeQ Liskov Substitution Principle 
+https://www.baeldung.com/java-open-closed-principle
+https://www.youtube.com/watch?v=5rbdwovjbw4 Method Reference in Java 8
+https://www.youtube.com/watch?v=S5zVwjtMxoc Method() and Constructor Reference by Durga
+https://www.youtube.com/watch?v=d8NfHwVTcO0 Predicate, Function & Consumar by Durga Sir
+https://www.youtube.com/watch?v=5rbdwovjbw4 Method Reference JavaTechie
+https://www.youtube.com/watch?v=-1XE__rrbjQ Lambda Expression & Functional Interface Java Techie
+https://youtu.be/CwvlS3ViGFQ map () & flatMap() Example | JavaTechie
+https://www.youtube.com/watch?v=4BUKaazoYyg Optional Usage and Best Practices | JavaTechie
+https://www.prepbytes.com/blog/java/20-must-practice-basic-java-programs-for-beginners/
+https://youtu.be/4_jey1hfEw0?list=RDCMUCORuRdpN2QTCKnsuEaeK-kQ What’s new in 3.0 Release | Latest Features | JavaTechie
+https://youtu.be/NcLtLZqGu2M Spring Boot 3.0 + Spring Security 6 | JWT Authentication & Authorization | JavaTechie
+https://youtu.be/SzhWim1tnQk?list=PLQTYNpk8jwk2StWpxZU93ZdVC14OVKNED #22 Authentication & Authorization using Database | Spring Security 6.0
+https://youtu.be/WCOPonR1-R8 MYSQL8 ZIP install
+SOLID - 
+https://medium.com/@javatechie/solid-design-principle-java-ae96a48db97
+
+List<Integer> numbers = Arrays.asList(1,2,3,4,5,3,2,4,4,2,2,1);
+
+Map<Integer, Long> occurrences = numbers.stream()
+	.collect(Collectors.groupingBy(n -> n, Collectors.counting()));
+
+products.sort(Comparator.comparing(Product::getName));
+products.stream().map(Product::getName).forEach(System.out::println);
+
+Collections.sort(employeeList,new NameComparator());
+System.out.println("Name sort: "); employeeList.stream()
+	.map(Employee::getName)
+	.forEach(System.out::println);
+
+
+System.out.println("\nAge reverse sort: "); employeeList.stream()
+	.map(Employee::getAge)
+	.sorted(Comparator.reverseOrder())
+	.forEach(System.out::println);
+
+System.out.println("\nPincode reverse sort: "); employeeList.stream()
+	.map(employee -> employee.getAddress().getPincode())
+	.sorted(Comparator.reverseOrder())
+	.forEach(System.out::println);
+
+
+try with resource
+compositkey
+named query, parameterized query
+How to use stack memory and heap memory in java program
+Cache management is java with example Guava/Ehcache
+Difference between Serialization and Externalization
+Difference between HashMap, ConcurrentHashMap, SynchronizedHasshMap and its uses
+Difference between java HashMap, ConcurrentHashMap, SynchronizedHasshMap and its uses
+replacement ng-show , ng-hide
+SOLID
+IOC Container
+Sprint Cloud
+Disadvantage of Dependency Injection
+IOC Container
+Difference in directives and components
+sql query optimization step
+uses of Spring Cloud
+sql query optimization step
+core java oops cocepts
+project modular changes estimation techniques
+Memory challenges
+MVC CONTROLLER AND REST CONTROLLER
+Difference between String, StringBuffer and StringBuilder and where to use which one
+How to maintain session in case of guest user
+Difference between OAuth and OAuth2
+
+
+Single Responsibility
+Open/Closed
+Liskov Substitution
+Interface segregation
+Dependency inversion
+
+===================
+https://www.youtube.com/watch?v=6XrL5jXmTwM UML class diagrams
+https://www.youtube.com/watch?v=4emxjxonNRI UML use case diagrams
+
+Stream<String> streamEmpty = Stream.empty();
+Stream<String> streamOfArray = Stream.of("a", "b", "c");
+
+
+Collection<String> collection = Arrays.asList("a", "b", "c");
+Stream<String> streamOfCollection = collection.stream();
+
+Stream<String> streamOfArray = Stream.of("a", "b", "c");
+
+String[] arr = new String[]{"a", "b", "c"};
+Stream<String> streamOfArrayFull = Arrays.stream(arr);
+Stream<String> streamOfArrayPart = Arrays.stream(arr, 1, 3);
+
+String s1 = "jai";
+Consumer<String> c1 = System.out::println;
+c1.accept(s1);
+
+===============
+
+
+twilio.account_sid=
+twilio.auth_token=
+twilio.trial_number=
+
+@Configuration
+@ConfigurationProperties(prefix="twilio")
+@Data
+TwilioConfig
+
+Application
+@PostConstruct
+initTwilio()
+Twilio.init(twilioConfig.sid, twilioConfig.auth_token)
+
+@Service
+TwilioOTPService
+Mono<PasswordResetReponseDto> sendOTPForPasswordReset(PasswordResetRequestDto)
+PasswordResetReponseDto 
+Map otpMap
+try {
+PhoneNumber to=new PhoneNumber(PasswordResetRequestDto.getPhoneNum)
+PhoneNumber from=new PhoneNumber(twilioConfig.getTrailNumber)
+String otpMsg = "Dear Customer, " + otp;
+Message message = Message.creator(to,from,otpMsg).create();
+PasswordResetReponseDto = new PasswordResetReponseDto(OtpStatus.DELIVERED, otpMsg)
+} catch(Exception ex)
+{ PasswordResetReponseDto = new PasswordResetReponseDto(OtpStatus.FAILED, excp.getmessage)}
+return Mono.just(PasswordResetReponseDto );
+
+validateOTP
+
+
+PasswordResetRequestDto
+String phnum,username, otp
+
+@Data
+@AllArgumentConstructor
+@NoArgumentConstructor
+PasswordResetReponseDto
+OtpStatus status
+String message
+
+Enum OtpStatus
+DELIVERED, FAILED
+
+
+List<Integer> values = Arrays.asList(4,5,6,7,8);
+
+for(int i=0; i< values.size(); i++) {
+	System.out.println(values.get(i));
+}
+
+for(int value : values) {
+	System.out.println(value);
+}
+
+values.forEach(System.out::println);
+
+values.forEach(i -> System.out.println(i));
+
+values.stream().forEach(System.out::println);
+
+class ConsumerImpl implements Consumer<Integer> {
+    public void accept(Integer i) {
+        System.out.println(i);
+    }
+}
+
+class PredicateImpl implements Predicate<Integer> {
+    public boolean test(Integer i){
+        return i%2==0;
+    }
+}
+Predicate<Integer> predicate = i -> i%2==0;
+List<Integer> values = Arrays.asList(3,4,5,6,7,8);
+Consumer<Integer> consume = i -> System.out.println(i);
+values.forEach(consume);
+
+git --version
+git config --global user.name "<USER_NAME>"
+git config --global user.email "<USER_EMAIL>"
+git config --list
+git status/add/commit/log/help
+
+
+
+
+class Solution {public int solution(int[] A) {// write your code in C# 6.0 with .NET 4.5 (Mono)List<int> numbers = new List<int>();numbers.AddRange(A);numbers.Sort();int first = numbers.First();int last = numbers.Last();
+var missing = Enumerable.Range(first, last).Where(n => n % first == 0).Except(numbers);
+return missing.First();}}
+
+FrogJmp (Frog Jump)
+Fibonacci
+
+Print an Array
+
+public static void main(String[] args) {
+        int[] array = {1, 2, 3, 4, 5};
+
+        System.out.println(Arrays.toString(array));
+    }
+
+public static void main(String[] args) {
+        int[][] array = {{1, 2}, {3, 4}, {5, 6, 7}};
+
+        System.out.println(Arrays.deepToString(array));
+    }	
+	
+
+public int[] fib(int MX) {
+    if(MX == 1) { return new int [] { 0 }; }
+    if(MX == 2) { return new int [] { 0, 1 }; }
+   
+    int [] fibb = new int [MX];
+    fibb[0] = 0;
+    fibb[1] = 1;
+
+    for(int i=2; i<fibb.length; i++) {
+      fibb[i] = fibb[i-1] + fibb[i-2];
+    }
+    return fibb;
+  }	
+
+static int frogJump(int X, int Y, int D) {
+
+        int dist = Y - X;
+        int jump = dist / D;
+        if(dist % D != 0) jump++;
+        return jump;
+    }  
+
+static int binGap(int N) {
+        String binStr = Integer.toBinaryString(N);
+        List oneList = new ArrayList();
+        for(int i=0; i< binStr.length(); i++) {
+            if(binStr.charAt(i) == '0') continue;
+            oneList.add(i);
+        }
+        int longdist = 0;
+        for(int i=0; i< oneList.size() -1; i++) {
+            int diff = (int) oneList.get(i+1) -  (int) oneList.get(i) -1;
+            longdist = Math.max(longdist, diff);
+        }
+        return longdist;
+    }	
+
+
+
+
+
+
+
+public class MinDeletionsToMakeStringBalanced {
+    
+    public int solution(String s) {
+        int openCount = 0;
+        int deletions = 0;
+
+        for (char c : s.toCharArray()) {
+            if (c == '(') {
+                openCount++;
+            } else if (c == ')') {
+                if (openCount > 0) {
+                    openCount--;
+                } else {
+                    deletions++;
+                }
+            }
+        }
+
+        // Remaining opening brackets need to be deleted
+        deletions += openCount;
+
+        return deletions;
+    }
+
+    public static void main(String[] args) {
+        String s = "))((";
+        System.out.println("Minimum deletions required: " + minDeletionsToBalance(s));
+    }
+}
+
+
+public String solution(String s) {
+        StringBuilder result = new StringBuilder();
+        char lastChar = ' ';
+        
+        for (char c : s.toCharArray()) {
+            if (c != lastChar) {
+                result.append(c);
+                lastChar = c;
+            }
+        }
+
+        return result.toString();
+    }
+
+
+
+We are givin a string S of length N consisting only of letter 'A' and/or 'B'. Our goal is to obtained a string in the format "A...AB...B" (all letters 'A' occur before all letters 'B') by deleting some letters from S. In particular, strings consisting only of letters 'A' or only of letters 'B' fit this format. Write a function: class Solution { public int solution(String S); } that, given a string S, returns the minimum number of letters that need to be deleted from S in order to obtain a string in the above format.
+Examples: 
+1. Given S = "BAAABAB", the function should return 2. We can obtain "AAABB" by deleting the frist occurence of 'B' and the last occurence of 'A'.
+2. Given S = "BBABAA", the function should retrun 3. We can delete all occurences of 'A' or all occurences of 'B'.
+3. Given S = "AABBBB", the function should retrun 0. We do not have to delete any letters, because the given string is already in the expected format. 
+
+
+
+
+public class FormatString {
+    
+    public static String obtainFormatString(String s) {
+        int countA = 0, countB = 0;
+        
+        for (char c : s.toCharArray()) {
+            if (c == 'A') {
+                countA++;
+            } else if (c == 'B') {
+                countB++;
+            }
+        }
+        
+        StringBuilder result = new StringBuilder();
+        
+        if (countA > countB) {
+            for (int i = 0; i < countB; i++) {
+                result.append('A');
+            }
+            for (int i = 0; i < countB; i++) {
+                result.append('B');
+            }
+        } else {
+            for (int i = 0; i < countA; i++) {
+                result.append('A');
+            }
+        }
+
+        return result.toString();
+    }
+
+    public static void main(String[] args) {
+        String s = "AABBBAAAB"; // Example input string
+        String formattedString = obtainFormatString(s);
+        System.out.println("Formatted string: " + formattedString);
+    }
+}
+
+
+
+
+
+
+public class MaximumBananaMove {
+    
+    public static int maxBananaMove(String s) {
+        // Count occurrences of each letter
+        int[] count = new int[26];
+        for (char c : s.toCharArray()) {
+            count[c - 'A']++;
+        }
+
+        // Calculate how many times "BANANA" can be formed
+        int maxMoves = Integer.MAX_VALUE;
+        maxMoves = Math.min(maxMoves, count['B' - 'A']); // 'B' appears only once in "BANANA"
+        maxMoves = Math.min(maxMoves, count['A' - 'A'] / 3); // 'A' appears three times in "BANANA"
+        maxMoves = Math.min(maxMoves, count['N' - 'A'] / 2); // 'N' appears twice in "BANANA"
+        
+        return maxMoves;
+    }
+
+    public static void main(String[] args) {
+        String s = "BANANAS";
+        System.out.println("Maximum number of times the move can be applied: " + maxBananaMove(s));
+    }
+}
+
+
+
+
+
+
+public class StringOperations {
+    
+    public String solution(String s, String t) {
+        int n = s.length();
+        int m = t.length();
+
+        if (n == m) {
+            if (s.equals(t)) {
+                return "EQUAL";
+            } else if (isInsert(s, t)) {
+                return "INSERT";
+            } else if (isRemove(s, t)) {
+                return "REMOVE";
+            } else if (isSwap(s, t)) {
+                return "SWAP";
+            }
+        } else if (n + 1 == m) {
+            if (isInsert(s, t)) {
+                return "INSERT";
+            }
+        } else if (n - 1 == m) {
+            if (isRemove(s, t)) {
+                return "REMOVE";
+            }
+        }
+
+        return "IMPOSSIBLE";
+    }
+
+    private boolean isInsert(String s, String t) {
+        int i = 0, j = 0;
+
+        while (i < s.length() && j < t.length()) {
+            if (s.charAt(i) != t.charAt(j)) {
+                if (i != j) return false;
+                j++;
+            } else {
+                i++;
+                j++;
+            }
+        }
+
+        return true;
+    }
+
+    private  boolean isRemove(String s, String t) {
+        return isInsert(t, s);
+    }
+
+    private  boolean isSwap(String s, String t) {
+        int firstDiff = -1, secondDiff = -1;
+
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) != t.charAt(i)) {
+                if (firstDiff == -1) {
+                    firstDiff = i;
+                } else if (secondDiff == -1) {
+                    secondDiff = i;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return (firstDiff != -1 && secondDiff != -1 && 
+                s.charAt(firstDiff) == t.charAt(secondDiff) && 
+                s.charAt(secondDiff) == t.charAt(firstDiff));
+    }
+
+    public static void main(String[] args) {
+        String s = "abcd";
+        String t1 = "abdc"; // SWAP
+        String t2 = "abcde"; // INSERT
+        String t3 = "abc"; // REMOVE
+        String t4 = "abcdf"; // IMPOSSIBLE
+
+        System.out.println(stringOperation(s, t1)); // SWAP
+        System.out.println(stringOperation(s, t2)); // INSERT
+        System.out.println(stringOperation(s, t3)); // REMOVE
+        System.out.println(stringOperation(s, t4)); // IMPOSSIBLE
+    }
+}
+
+
+
+// passing function to a function
+List<String> names = Arrays.asList("Navin","Reddy");
+/*Consumer<String> con = new Consumer<String>()
+{
+	public void accept(String s){ sout(str);}
+};*/
+Consumer<String> con = s -> sout(str);
+
+names.forEach(System.out::println);
+//names.forEach(str -> sout(con));
+//names.forEach(str -> sout(str));
+
+// ::println -- this a mothod - ::
+
+
+import java.util.function.*;
+
+public class MethodReferenceExample {
+    public static void main(String[] args) {
+        // Reference to a static method
+        Function<Integer, String> staticMethodRef = MethodReferenceExample::staticMethod;
+        System.out.println(staticMethodRef.apply(5)); // Output: The number is 5
+
+        // Reference to an instance method of a particular object
+        MethodReferenceExample instance = new MethodReferenceExample();
+        Function<String, String> instanceMethodRef = instance::instanceMethod;
+        System.out.println(instanceMethodRef.apply("world")); // Output: Hello, world!
+
+        // Reference to an instance method of an arbitrary object of a particular type
+        Function<String, Integer> lengthMethodRef = String::length;
+        System.out.println(lengthMethodRef.apply("Java")); // Output: 4
+
+        // Reference to a constructor
+        Supplier<MethodReferenceExample> constructorRef = MethodReferenceExample::new;
+        MethodReferenceExample newObj = constructorRef.get();
+        newObj.method(); // Output: Constructor called
+    }
+
+    // Static method
+    public static String staticMethod(Integer num) {
+        return "The number is " + num;
+    }
+
+    // Instance method
+    public String instanceMethod(String name) {
+        return "Hello, " + name + "!";
+    }
+
+    // Constructor
+    public MethodReferenceExample() {
+        System.out.println("Constructor called");
+    }
+
+    // Another method
+    public void method() {
+        System.out.println("Method called");
+    }
+}
+
+
+
+Function<Integer, String> intToString = num -> Integer.toString(num);
+String result = intToString.apply(10); // result will be "10"
+
+Supplier<Double> randomNumberSupplier = () -> Math.random();
+double randomNumber = randomNumberSupplier.get(); // Get a random number
+
+Consumer<String> stringPrinter = str -> System.out.println(str);
+stringPrinter.accept("Hello, world!"); // Prints "Hello, world!"
+
+Predicate<Integer> isEven = num -> num % 2 == 0;
+boolean result = isEven.test(5); // result will be false
+
+
+import java.util.stream.IntStream;
+
+public class IntStreamExample {
+    public static void main(String[] args) {
+        // Creating an IntStream from a range
+        IntStream.range(1, 10)
+                 .forEach(System.out::println); // Prints numbers from 1 to 9
+
+        // Creating an IntStream from an array
+        int[] numbers = {1, 2, 3, 4, 5};
+        IntStream streamFromArray = IntStream.of(numbers);
+        streamFromArray.forEach(System.out::println); // Prints numbers 1 to 5
+
+        // Using map to transform elements
+        IntStream.range(1, 5)
+                 .map(x -> x * 2)
+                 .forEach(System.out::println); // Prints even numbers from 2 to 8
+
+        // Using filter to select elements
+        IntStream.range(1, 10)
+                 .filter(x -> x % 2 == 0)
+                 .forEach(System.out::println); // Prints even numbers from 2 to 8
+
+        // Using sum to calculate the sum of elements
+        int sum = IntStream.range(1, 6)
+                          .sum();
+        System.out.println("Sum: " + sum); // Prints "Sum: 15"
+    }
+}
+
+
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CustomAuthenticationProvider implements AuthenticationProvider {
+
+    private final UserDetailsService userDetailsService;
+
+    public CustomAuthenticationProvider(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String username = authentication.getName();
+        String password = authentication.getCredentials().toString();
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        // Perform custom authentication logic here
+        // For example, compare the provided password with the one stored in the UserDetails object
+        if (password.equals(userDetails.getPassword())) {
+            return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
+        } else {
+            throw new BadCredentialsException("Invalid username or password");
+        }
+    }
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+    }
+}
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final AuthenticationProvider authenticationProvider;
+
+    public SecurityConfig(AuthenticationProvider authenticationProvider) {
+        this.authenticationProvider = authenticationProvider;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(authenticationProvider);
+    }
+}
+
+
+
+========================
+
+
+import java.security.Key;
+import java.util.Base64;
+import java.util.Properties;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import jakarta.persistence.AttributeConverter;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class StringCryptoConverter implements AttributeConverter<String, String> {
+
+	private static String ALGORITHM = null;
+	private static byte[] KEY = null;
+	public static final String algorithm_property_key = "encryption.algorithm";
+	public static final String secret_property_key = "encryption.key";
+	public static final Properties properties = new Properties();
+	static {
+		try {
+			properties.load(StringCryptoConverter.class.getClassLoader().getResourceAsStream("encryption.properties"));
+		} catch (Exception e) {
+			log.error("Exception while reading config {} ",e.getMessage());
+			System.exit(-1);
+		}
+		ALGORITHM = (String) properties.get(algorithm_property_key);
+		KEY = ((String) properties.get(secret_property_key)).getBytes();
+	}
+
+	@Override
+	public String convertToDatabaseColumn(String arg0) {
+		if (StringUtils.isBlank(arg0))
+			return null;
+		Key key = new SecretKeySpec(KEY, "AES");
+		try {
+			Cipher c = Cipher.getInstance(ALGORITHM);
+			c.init(Cipher.ENCRYPT_MODE, key);
+			String encryptedData = Base64.getEncoder().encodeToString((c.doFinal(arg0.getBytes())));
+			return encryptedData;
+		} catch (Exception e) {
+			log.error("Error occurred while encrypting input value", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public String convertToEntityAttribute(String arg0) {
+		if (StringUtils.isBlank(arg0))
+			return null;
+		Key key = new SecretKeySpec(KEY, "AES");
+		try {
+			Cipher c = Cipher.getInstance(ALGORITHM);
+			c.init(Cipher.DECRYPT_MODE, key);
+			String decruptedData = new String(c.doFinal(Base64.getDecoder().decode(arg0)));
+			return decruptedData;
+		} catch (Exception e) {
+			log.error("Error occurred while decrypting input value", e);
+			return "";
+		}
+	}
+
+}
+
+encryption.algorithm=AES/ECB/PKCS5Padding
+## 256 bit or 32 byte key
+encryption.key
+
+
+=============Strategy Pattern===============
+
+interface PaymentStrategy {
+    void payment(double amt);
+}
+
+class CCAvenue implements PaymentStrategy {
+    @Override
+    public void payment(double amt){
+        System.out.println("CCAvenue payment " + amt);
+    }
+}
+
+class PaymentService {
+    private PaymentStrategy strategy;
+    public PaymentService(PaymentStrategy strategy){
+        this.strategy = strategy;
+    }
+    public void makePayment(double amt){
+        strategy.payment(amt);
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+        PaymentService service = new PaymentService(new CCAvenue());
+        service.makePayment(500.0);
+    }
+}
+
+=============Factory Pattern===============
+
+
+interface Notification {
+    void send();
+}
+
+class EmailNotification implements Notification {
+    public void send(){
+        System.out.println("Email notification send");
+    }
+}
+
+class NotificationFactory {
+    public static Notification createNotification(String type) {
+        
+        if(type.equals("EMAIL")) {
+            return new EmailNotification();
+        }
+        
+        //throw new IllegalArgumentException("Invalid type");
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+        NotificationFactory factory = new NotificationFactory();
+        Notification noti = factory.createNotification("EMAIL");
+        noti.send();
+    }
+}
+
+=============Singleton Pattern===============
+
+class Singleton{
+    private static Singleton instance;
+    private Singleton(){}
+    public static Singleton getInstance(){
+        if(instance == null){
+        synchronized(Singleton.class){
+            if(instance == null){
+                instance = new Singleton();
+            }
+        }
+    }
+    return instance;
+    }
+}
+
+
+class Main {
+    public static void main(String[] args) {
+        Singleton singleton = Singleton.getInstance();
+        Singleton singleton1 = Singleton.getInstance();
+       
+            System.out.println(singleton==singleton1);
+        
+    }
+}
+
+========== Static inner class ==============
+class Singleton{
+    private Singleton(){
+        System.out.println("Instance created");
+    }
+    public static class SingletonHelper {
+        private static final Singleton INSTANCE = new Singleton();
+    }
+    public static Singleton getInstance(){
+        return SingletonHelper.INSTANCE;
+    }
+}
